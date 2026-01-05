@@ -1,9 +1,16 @@
 # .htaccess para pasta /public
 
-# Força HTTP para HTTPS
+# Força HTTP para HTTPS e adiciona www
 RewriteEngine On
-RewriteCond %{HTTPS} off
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Redireciona para https e www
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} !^www\. [NC]
+RewriteRule ^ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
+
+# Remove www duplicado se já existir
+RewriteCond %{HTTP_HOST} ^www\.www\.(.+)$ [NC]
+RewriteRule ^ https://www.%1%{REQUEST_URI} [L,R=301,NE]
 
 # Redireciona todas as requisições para /public
 RewriteCond %{REQUEST_URI} !^/public/
