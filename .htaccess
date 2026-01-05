@@ -1,0 +1,16 @@
+# .htaccess para pasta /public
+
+# Redireciona todas as requisições para /public
+RewriteEngine On
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ /public/$1 [L]
+
+# Permite acesso direto a arquivos existentes
+RewriteCond %{DOCUMENT_ROOT}/public/$1 -f
+RewriteRule ^public/(.*)$ /public/$1 [L]
+
+# Protege arquivos sensíveis
+<FilesMatch "\.(env|htaccess|git|json|yml|yaml|lock|log)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
