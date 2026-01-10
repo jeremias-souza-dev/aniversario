@@ -129,6 +129,25 @@
 }
 
 @layer utilities {
+  /* Safe area helpers for mobile notch */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  /* Dynamic viewport height for mobile browsers */
+  .min-h-dvh {
+    min-height: 100dvh;
+  }
+
+  /* Reduced motion: disable animations for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    [class*="animate-"] {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
   /* Custom utility to support @apply outline-ring/50 */
   .outline-ring\/50 {
     /* outline-width: 1px;
