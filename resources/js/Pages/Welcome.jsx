@@ -16,7 +16,6 @@ import {
   CheckCircle,
   Cake,
   MapPin,
-  Share2,
 } from "lucide-react"
 
 function NoiseTexture() {
@@ -67,6 +66,61 @@ function Confetti() {
   )
 }
 
+function IntroPurposeSlide() {
+  return (
+    <section className="min-h-[calc(100dvh-200px)] flex items-center justify-center px-6 py-8 w-full">
+      <div className="bg-white/95 backdrop-blur-sm rounded-[2rem] border-2 border-white/80 shadow-2xl p-8 sm:p-10 max-w-xl w-full text-center space-y-6">
+        <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#E9B7BD] to-[#D59B83] flex items-center justify-center shadow-xl">
+          <PartyPopper className="w-10 h-10 text-white" />
+        </div>
+
+        <h1 className="text-3xl sm:text-4xl font-serif font-black text-[#7B3B3B]">Você foi convidado 💖</h1>
+
+        <p className="text-base sm:text-lg text-[#8B6B6B] leading-relaxed">
+          Preparamos tudo com carinho para você.
+          <br />
+          Em poucos passos, confirme sua presença no aniversário da <strong>Sarah Lorraine</strong>.
+          <br />
+          <span className="font-bold text-[#7B3B3B]">É rápido e muito importante para nós ✨</span>
+        </p>
+
+        <p className="text-xs text-[#7B3B3B] font-bold tracking-widest animate-pulse">👉 Deslize para continuar</p>
+      </div>
+    </section>
+  )
+}
+
+function ConviteSlide() {
+  return (
+    <section className="min-h-[calc(100dvh-200px)] flex items-center justify-center px-6 py-6 w-full">
+      <div className="bg-white/95 backdrop-blur-sm rounded-[2rem] border-2 border-white/80 shadow-2xl p-8 sm:p-10 max-w-xl w-full text-center space-y-6">
+        <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#E9B7BD] to-[#D59B83] flex items-center justify-center shadow-xl">
+          <PartyPopper className="w-10 h-10 text-white" />
+        </div>
+
+        <h1 className="text-3xl sm:text-4xl font-serif font-black text-[#7B3B3B]">Você foi convidado 💖</h1>
+
+        <p className="text-base sm:text-lg text-[#8B6B6B] leading-relaxed">
+          É com muito carinho que convidamos você para o aniversário da
+          <br />
+          <strong>Sarah Lorraine</strong> 🎉
+        </p>
+
+        <div className="bg-white rounded-2xl border-2 border-white/80 shadow-sm p-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <span className="inline-flex items-center gap-1.5 text-[#7B3B3B] text-xs sm:text-sm font-bold bg-[#F7ECEB] border border-[#E9B7BD]/40 px-3 py-1.5 rounded-full shadow-sm">
+            <Calendar className="w-3.5 h-3.5" /> 28 de Fevereiro • 13h
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-[#8B6B6B] text-xs sm:text-sm font-semibold bg-white border border-[#F5D1A3]/40 px-3 py-1.5 rounded-full shadow-sm">
+            <MapPin className="w-3.5 h-3.5 text-[#D59B83]" /> Buffet Jokempô – Vila Industrial
+          </span>
+        </div>
+
+        
+      </div>
+    </section>
+  )
+}
+
 function WelcomeSlide({ guestName }) {
   const displayName = guestName || "convidado"
 
@@ -82,66 +136,15 @@ function WelcomeSlide({ guestName }) {
         <div className="relative z-10 text-center space-y-6 sm:space-y-8">
           <div className="mx-auto w-full max-w-xl">
             <h1 className="text-4xl sm:text-5xl font-serif font-black text-[#7B3B3B] leading-tight">
-              Olá, {displayName}!
+              Olá, {displayName}! 🎉
             </h1>
             <p className="mt-2 text-base sm:text-lg text-[#8B6B6B]">
-              Você foi convidado para o aniversário da Sarah Lorraine. Para que possamos organizar o buffet e os lugares
-              com todo carinho, confirme sua presença nos próximos slides. É rápido e ajuda muito!
+              Preparamos tudo com carinho para você. Deslize para ver os detalhes 💖
             </p>
-          </div>
-
-          <div className="mt-1 grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
-            <div className="bg-white rounded-xl p-4 border border-[#F2D8D8]/60 shadow-sm text-left flex items-start gap-3">
-              <div className="w-12 h-12 rounded-md bg-[#FFF6F6] flex items-center justify-center text-[#D59B83]">
-                <Calendar className="w-6 h-6" />
-              </div>
-              <div>
-                <div className="text-xs text-[#8B6B6B]/90 uppercase font-semibold">Data & Horário</div>
-                <div className="font-bold text-[#7B3B3B]">28 de Fevereiro — 13h00</div>
-                <div className="text-xs text-[#8B6B6B]">Buffet Jokempô • Vila Industrial</div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-4 border border-[#F2D8D8]/60 shadow-sm text-left flex items-start gap-3">
-              <div className="w-12 h-12 rounded-md bg-[#FFF8F1] flex items-center justify-center text-[#8FB59A]">
-                <Users className="w-6 h-6" />
-              </div>
-              <div>
-                <div className="text-xs text-[#8B6B6B]/90 uppercase font-semibold">Convidados</div>
-                <div className="font-bold text-[#7B3B3B]">Visão geral e ingressos</div>
-                <div className="text-xs text-[#8B6B6B]">Veja quem foi convidado e quantos lugares garantidos</div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-4 border border-[#F2D8D8]/60 shadow-sm text-left flex items-start gap-3">
-              <div className="w-12 h-12 rounded-md bg-[#FFF7F6] flex items-center justify-center text-[#E9B7BD]">
-                <ClipboardList className="w-6 h-6" />
-              </div>
-              <div>
-                <div className="text-xs text-[#8B6B6B]/90 uppercase font-semibold">Instruções</div>
-                <div className="font-bold text-[#7B3B3B]">Cronograma & recomendações</div>
-                <div className="text-xs text-[#8B6B6B]">
-                  Dicas rápidas para o dia: chegada, brincadeiras e segurança
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-4 border border-[#F2D8D8]/60 shadow-sm text-left flex items-start gap-3">
-              <div className="w-12 h-12 rounded-md bg-[#F7F8F3] flex items-center justify-center text-[#D59B83]">
-                <CheckCircle className="w-6 h-6" />
-              </div>
-              <div>
-                <div className="text-xs text-[#8B6B6B]/90 uppercase font-semibold">Confirmação</div>
-                <div className="font-bold text-[#7B3B3B]">Confirme sua presença</div>
-                <div className="text-xs text-[#8B6B6B]">Toque no slide "Confirmar" para reservar seu lugar</div>
-              </div>
+            <div className="mt-4 inline-flex items-center gap-1.5 text-[#7B3B3B] text-xs sm:text-sm font-bold bg-[#F7ECEB] border border-[#E9B7BD]/40 px-3 py-1.5 rounded-full shadow-sm">
+              <Calendar className="w-3.5 h-3.5" /> 28 de Fevereiro • 13h00 • Buffet Jokempô
             </div>
           </div>
-
-          <p className="mt-2 text-xs text-[#8B6B6B]/80">
-            Avance para ver o convite completo, o cronograma e a lista de convidados. Obrigado por fazer parte desta
-            festa!
-          </p>
         </div>
       </div>
     </section>
@@ -150,10 +153,10 @@ function WelcomeSlide({ guestName }) {
 
 function InstructionsSlide() {
   const schedule = [
-    { Icon: Clock, hora: "13h", title: "Recepção", desc: "Crianças livres para brincar à vontade" },
-    { Icon: Users, hora: "14h", title: "Piquenique", desc: "Hora de comer e brincar junto" },
-    { Icon: Cake, hora: "15h", title: "Parabéns", desc: "O momento mais especial" },
-    { Icon: Sparkles, hora: "16h", title: "Despedida", desc: "Últimas brincadeiras e diversão" },
+    { Icon: Clock, hora: "1ª hora", title: "Recepção", desc: "Crianças livres para brincar à vontade" },
+    { Icon: Users, hora: "2ª hora", title: "Piquenique", desc: "Hora de comer e brincar junto" },
+    { Icon: Cake, hora: "3ª hora", title: "Parabéns", desc: "O momento mais especial" },
+    { Icon: Sparkles, hora: "4ª hora", title: "Despedida", desc: "Últimas brincadeiras e diversão" },
   ]
 
   return (
@@ -167,7 +170,7 @@ function InstructionsSlide() {
             <div className="flex items-start gap-2 mb-3">
               <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-[#E9B7BD] via-[#D59B83] to-[#8FB59A]" />
               <div>
-                <h3 className="text-[#7B3B3B] font-serif font-bold text-lg sm:text-xl">Cronograma</h3>
+                <h3 className="text-[#7B3B3B] font-serif font-bold text-lg sm:text-xl">Como será o dia</h3>
                 <p className="text-xs sm:text-xs text-[#8B6B6B] font-medium mt-1">Horário: 13h às 17h</p>
               </div>
             </div>
@@ -231,6 +234,7 @@ function GroupSlide({ grupo }) {
             Seus Convites
           </h2>
           <p className="text-base sm:text-lg text-[#8B6B6B] font-medium">{grupo.name}</p>
+          <p className="text-sm text-[#8B6B6B] mt-1">Esses são os convidados reservados para você 💕</p>
         </div>
 
         <div className="space-y-4">
@@ -247,8 +251,8 @@ function GroupSlide({ grupo }) {
                     <div className="flex items-center gap-5 pl-3">
                       <div
                         className={`w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] rounded-2xl sm:rounded-3xl flex items-center justify-center text-white shadow-lg ${isCrianca
-                            ? "bg-gradient-to-br from-[#8FB59A] to-[#7EA88E]"
-                            : "bg-gradient-to-br from-[#D59B83] to-[#C58973]"
+                          ? "bg-gradient-to-br from-[#8FB59A] to-[#7EA88E]"
+                          : "bg-gradient-to-br from-[#D59B83] to-[#C58973]"
                           }`}
                       >
                         {isCrianca ? <Baby size={32} strokeWidth={2} /> : <User size={32} strokeWidth={2} />}
@@ -317,7 +321,7 @@ function ConfirmationSlide({ confirmed, onConfirm }) {
                   Vai comparecer?
                 </h2>
                 <p className="text-[#8B6B6B] leading-relaxed text-base sm:text-lg max-w-md mx-auto">
-                  Sua confirmação é muito importante para organizarmos tudo com carinho!
+                  Sua confirmação garante os lugares e o buffet 🍰
                 </p>
               </div>
 
@@ -337,12 +341,13 @@ function ConfirmationSlide({ confirmed, onConfirm }) {
         ) : (
           <div className="relative">
             <div className="bg-gradient-to-br from-[#8FB59A]/25 to-[#7EA88E]/15 backdrop-blur-xl rounded-3xl sm:rounded-[3rem] border-2 border-[#8FB59A]/50 p-8 sm:p-12 text-center shadow-2xl">
+              <div role="status" aria-live="polite" className="sr-only">Confirmação enviada com sucesso</div>
               <div className="w-28 h-28 sm:w-32 sm:h-32 bg-[#8FB59A] rounded-full mx-auto flex items-center justify-center shadow-2xl mb-8 animate-bounce-once border-4 border-white/50">
                 <CheckCircle className="w-14 h-14 sm:w-16 sm:h-16 text-white" strokeWidth={3} />
               </div>
 
               <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-[#5A7A64] mb-5">
-                Oba! Confirmado!
+                Obrigado por confirmar!
               </h2>
               <p className="text-[#6B8B74] text-base sm:text-lg mb-8 max-w-md mx-auto leading-relaxed">
                 Que alegria ter você conosco! Já separamos seu lugar. Nos vemos lá!
@@ -396,9 +401,8 @@ function Preloader({ onComplete }) {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-[#FFF9F8] via-[#FFF5F6] to-[#FFF0F2] transition-opacity duration-500 ${
-        isVisible ? "opacity-100" : "opacity-0"
-      }`}
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-[#FFF9F8] via-[#FFF5F6] to-[#FFF0F2] transition-opacity duration-500 ${isVisible ? "opacity-100" : "opacity-0"
+        }`}
     >
       {/* Confetes */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -428,11 +432,11 @@ function Preloader({ onComplete }) {
 
       {/* Conteúdo CENTRALIZADO */}
       <div className="relative z-10 w-full h-full flex items-center justify-center px-6">
-          <div className="relative w-full max-w-4xl flex flex-col items-center justify-center text-center">
-            {/* STEP 1 - ocupa exatamente a mesma âncora */}
-            <div
-              className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-700 ${step === 1 ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-            >
+        <div className="relative w-full max-w-4xl flex flex-col items-center justify-center text-center">
+          {/* STEP 1 - ocupa exatamente a mesma âncora */}
+          <div
+            className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-700 ${step === 1 ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+          >
             <div className="mb-8">
               <div className="relative">
                 <div className="w-24 h-24 bg-gradient-to-br from-[#E9B7BD] to-[#D59B83] rounded-full flex items-center justify-center shadow-2xl animate-float">
@@ -460,10 +464,10 @@ function Preloader({ onComplete }) {
             </div>
           </div>
 
-            {/* STEP 2 - mesmo ponto de ancoragem, apenas opacidade */}
-            <div
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${step === 2 ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-            >
+          {/* STEP 2 - mesmo ponto de ancoragem, apenas opacidade */}
+          <div
+            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${step === 2 ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+          >
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white">
               <CheckCircle className="w-16 h-16 mx-auto text-[#8FB59A] mb-4" />
               <p className="text-3xl font-bold text-[#7B3B3B]">
@@ -481,7 +485,6 @@ function Preloader({ onComplete }) {
 }
 
 function EventHeader({ onShare }) {
-  const canShare = typeof navigator !== "undefined" && !!navigator.share
   return (
     <div className="fixed top-0 left-0 right-0 z-20 px-4 pt-safe pb-2">
       <div className="max-w-2xl md:max-w-3xl mx-auto">
@@ -493,21 +496,6 @@ function EventHeader({ onShare }) {
             <span className="hidden sm:inline-flex items-center gap-1.5 text-[#8B6B6B] text-xs font-semibold bg-white border border-[#F5D1A3]/40 px-2.5 py-1 rounded-full shadow-sm max-w-[220px] truncate">
               <MapPin className="w-3.5 h-3.5 text-[#D59B83]" /> Buffet Jokempô, Vila Industrial
             </span>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={onShare}
-              disabled={!canShare}
-              aria-label="Compartilhar convite"
-              className={`inline-flex items-center justify-center w-8 h-8 rounded-full transition-all ${canShare
-                  ? "bg-gradient-to-br from-[#E9B7BD] to-[#D59B83] text-white hover:scale-105 active:scale-95"
-                  : "bg-[#E9B7BD]/20 text-[#8B6B6B]/40 cursor-not-allowed"
-                }`}
-            >
-              <Share2 className="w-4.5 h-4.5" />
-            </button>
           </div>
         </div>
       </div>
@@ -538,9 +526,9 @@ export default function Welcome() {
 
   const slidesTitles = [
     { Icon: PartyPopper, label: "Convite" },
-    { Icon: ClipboardList, label: "Info" },
+    { Icon: ClipboardList, label: "Informações" },
     { Icon: Users, label: "Convidados" },
-    { Icon: CheckCircle, label: "Confirmar" },
+    { Icon: CheckCircle, label: "Confirmação" },
   ]
   const totalSlides = slidesTitles.length
 
@@ -648,12 +636,25 @@ export default function Welcome() {
 
       <main className="flex-1 relative z-10 overflow-y-auto overflow-x-hidden scroll-smooth pb-28 sm:pb-32 pt-20 sm:pt-24">
         <div className="transition-opacity duration-300 animate-fade-in">
-          {currentSlide === 0 && <WelcomeSlide guestName={guestName} />}
+          {currentSlide === 0 && <ConviteSlide />}
           {currentSlide === 1 && <InstructionsSlide />}
           {currentSlide === 2 && <GroupSlide grupo={grupo} />}
           {currentSlide === 3 && <ConfirmationSlide confirmed={confirmed} onConfirm={handleConfirm} />}
         </div>
       </main>
+
+      {currentSlide >= 2 && currentSlide !== totalSlides - 1 && (
+        <button
+          type="button"
+          onClick={() => goToSlide(totalSlides - 1)}
+          aria-label="Ir para confirmação"
+          title="Confirmar presença"
+          className="fixed z-40 right-4 sm:right-6 bottom-24 sm:bottom-28 inline-flex items-center gap-2 px-4 py-2 rounded-full text-white bg-gradient-to-r from-[#D59B83] to-[#E9B7BD] shadow-xl hover:scale-[1.03] active:scale-[0.98] transition-transform"
+        >
+          <CheckCircle className="w-5 h-5" />
+          <span className="font-bold text-sm">Confirmar</span>
+        </button>
+      )}
 
       <div className="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-[#F7F1EF] via-[#F7F1EF] to-transparent pt-4 pb-6 pb-safe px-4">
         <div className="max-w-2xl md:max-w-3xl mx-auto">
@@ -674,8 +675,8 @@ export default function Welcome() {
               onClick={handlePrev}
               disabled={currentSlide === 0}
               className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all ${currentSlide === 0
-                  ? "bg-[#E9B7BD]/20 text-[#8B6B6B]/30 cursor-not-allowed"
-                  : "bg-gradient-to-br from-[#E9B7BD] to-[#D59B83] text-white hover:scale-105 hover:shadow-lg active:scale-95"
+                ? "bg-[#E9B7BD]/20 text-[#8B6B6B]/30 cursor-not-allowed"
+                : "bg-gradient-to-br from-[#E9B7BD] to-[#D59B83] text-white hover:scale-105 hover:shadow-lg active:scale-95"
                 }`}
               aria-label="Slide anterior"
             >
@@ -692,8 +693,8 @@ export default function Welcome() {
                     aria-current={isActive ? "step" : undefined}
                     title={`${slide.label}`}
                     className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full transition-all ${isActive
-                        ? "bg-gradient-to-r from-[#7B3B3B] to-[#5A2D2D] text-white shadow-md scale-105"
-                        : "bg-transparent text-[#8B6B6B] hover:bg-[#F5D1A3]/20"
+                      ? "bg-gradient-to-r from-[#7B3B3B] to-[#5A2D2D] text-white shadow-md scale-105"
+                      : "bg-transparent text-[#8B6B6B] hover:bg-[#F5D1A3]/20"
                       }`}
                   >
                     <slide.Icon className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2} />
@@ -707,8 +708,8 @@ export default function Welcome() {
               onClick={handleNext}
               disabled={currentSlide === totalSlides - 1}
               className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all ${currentSlide === totalSlides - 1
-                  ? "bg-[#E9B7BD]/20 text-[#8B6B6B]/30 cursor-not-allowed"
-                  : "bg-gradient-to-br from-[#D59B83] to-[#E9B7BD] text-white hover:scale-105 hover:shadow-lg active:scale-95"
+                ? "bg-[#E9B7BD]/20 text-[#8B6B6B]/30 cursor-not-allowed"
+                : "bg-gradient-to-br from-[#D59B83] to-[#E9B7BD] text-white hover:scale-105 hover:shadow-lg active:scale-95"
                 }`}
               aria-label="Próximo slide"
             >
