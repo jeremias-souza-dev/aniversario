@@ -5,14 +5,33 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
+Route::get('/{telefone?}', function ($telefone = null) {
+
     return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+        'grupo' => [
+            'name' => 'Jeremias',
+            'telefone' => $telefone ?? null,
+            'convidados' => [
+                [
+                    'name' => 'Jeremias de souza',
+                    'isCrianca' => null,
+                ],
+                [
+                    'name' => 'Talita de souza',
+                    'isCrianca' => [
+                        'age' => 5,
+                    ],
+                ],
+                [
+                    'name' => 'Sarah Lorrane',
+                    'isCrianca' => [
+                        'age' => 2,
+                    ],
+                ],
+            ],
+        ],
     ]);
-});
+})->where('telefone', '^\d{10,15}$')->name('welcome');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -24,4 +43,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
