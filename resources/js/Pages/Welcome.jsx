@@ -244,7 +244,7 @@ function GroupSlide({ grupo }) {
 
                     <div className="flex items-center gap-5 pl-3">
                       <div
-                        className={`w-16 h-16 sm:w-18 sm:h-18 rounded-2xl sm:rounded-3xl flex items-center justify-center text-white shadow-lg ${
+                        className={`w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] rounded-2xl sm:rounded-3xl flex items-center justify-center text-white shadow-lg ${
                           isCrianca
                             ? "bg-gradient-to-br from-[#8FB59A] to-[#7EA88E]"
                             : "bg-gradient-to-br from-[#D59B83] to-[#C58973]"
@@ -308,7 +308,7 @@ function ConfirmationSlide({ confirmed, onConfirm }) {
 
             <div className="relative z-10 space-y-8">
               <div className="w-32 h-32 sm:w-36 sm:h-36 bg-gradient-to-br from-white to-[#FFF9F8] rounded-full mx-auto flex items-center justify-center shadow-2xl mb-6 border-4 border-[#E9B7BD]/20">
-                <PartyPopper className="w-16 h-16 sm:w-18 sm:h-18 text-[#E9B7BD] animate-wiggle" strokeWidth={2} />
+                <PartyPopper className="w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] text-[#E9B7BD] animate-wiggle" strokeWidth={2} />
               </div>
 
               <div>

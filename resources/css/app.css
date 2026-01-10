@@ -2,6 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Utilities e animações personalizadas usadas no design (JSX puro, sem TS) */
+@layer utilities {
+  /* Tamanho/posição de background para animação de gradiente */
+  .bg-size-200 { background-size: 200% 100%; }
+  .bg-pos-100 { background-position: 100% 50%; }
+
+  /* Safe area padding inferior em dispositivos com notch */
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0.75rem); }
+
+  /* Confetti fall */
+  @keyframes confetti-fall {
+    0% { transform: translate3d(0, -10%, 0) rotate(0deg); }
+    100% { transform: translate3d(0, 110%, 0) rotate(360deg); }
+  }
+  .animate-confetti-fall { animation-name: confetti-fall; animation-timing-function: linear; animation-iteration-count: infinite; }
+
+  /* Wiggle sutil */
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-2deg); }
+    50% { transform: rotate(2deg); }
+  }
+  .animate-wiggle { animation: wiggle 1.2s ease-in-out infinite; }
+
+  /* Flutuar */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .animate-float { animation: float 3s ease-in-out infinite; }
+
+  /* Pulse mais lento */
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .6; }
+  }
+  .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+
+  /* Bounce uma vez */
+  @keyframes bounce-once {
+    0%, 100% { transform: translateY(0); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+    50% { transform: translateY(-22%); animation-timing-function: cubic-bezier(0,0,0.2,1); }
+  }
+  .animate-bounce-once { animation: bounce-once 600ms both; }
+
+  /* Gradiente animado (deslocamento do background) */
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .animate-gradient { animation: gradient-shift 4s ease infinite; }
+}
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
