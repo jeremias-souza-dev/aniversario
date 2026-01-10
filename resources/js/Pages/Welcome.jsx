@@ -29,6 +29,43 @@ function NoiseTexture() {
   )
 }
 
+function ThankYouSlide({ statuses }) {
+  const confirmados = (statuses || []).filter((s) => s === "confirmado").length
+  const ausentes = (statuses || []).filter((s) => s === "nao").length
+  const vai = confirmados > 0
+
+  return (
+    <section className="min-h-[calc(100dvh-200px)] flex items-center justify-center px-4 sm:px-6 w-full">
+      <div className={`w-full max-w-2xl md:max-w-3xl text-center bg-white/90 backdrop-blur-xl rounded-3xl border-2 border-white/80 p-8 sm:p-12 shadow-2xl`}>
+        <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full mx-auto flex items-center justify-center shadow-2xl mb-6 ${vai ? "bg-[#8FB59A]" : "bg-[#E9B7BD]"}`}>
+          <CheckCircle className="w-14 h-14 sm:w-16 sm:h-16 text-white" strokeWidth={3} />
+        </div>
+
+        <h2 className="text-4xl sm:text-5xl font-serif font-bold text-[#7B3B3B] mb-4">
+          Obrigado!
+        </h2>
+        <p className="text-[#8B6B6B] text-base sm:text-lg mb-6 max-w-md mx-auto leading-relaxed">
+          {vai
+            ? `Que alegria ter você conosco! Reservamos lugares para ${confirmados} ${confirmados === 1 ? "pessoa" : "pessoas"}.`
+            : "Entendemos. Sentiremos sua falta — esperamos você numa próxima!"}
+        </p>
+
+        <div className="bg-white rounded-2xl p-6 border-2 border-white/80 shadow">
+          <div className="flex items-center justify-center gap-6">
+            <div>
+              <p className="text-xs sm:text-sm text-[#8B6B6B] uppercase tracking-widest font-bold">Confirmados</p>
+              <p className="text-3xl sm:text-4xl font-black text-[#7B3B3B]">{confirmados}</p>
+            </div>
+            <div>
+              <p className="text-xs sm:text-sm text-[#8B6B6B] uppercase tracking-widest font-bold">Não irão</p>
+              <p className="text-3xl sm:text-4xl font-black text-[#7B3B3B]">{ausentes}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
 function Confetti() {
   const prefersReduced =
     typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -223,18 +260,20 @@ function InstructionsSlide() {
   )
 }
 
-function GroupSlide({ grupo }) {
+function GroupSlide({ grupo, statuses, onChangeStatus }) {
   const convidados = grupo?.convidados || []
+  const confirmados = (statuses || []).filter((s) => s === "confirmado").length
+  const ausentes = (statuses || []).filter((s) => s === "nao").length
 
   return (
-    <div className="min-h-[calc(100dvh-200px)] flex items-center justify-center px-4 sm:px-6 py-6 w-full max-w-2xl md:max-w-3xl mx-auto">
+    <div className="h-[calc(100dvh-200px)] flex items-center justify-center px-4 sm:px-6 w-full max-w-2xl md:max-w-3xl mx-auto">
       <div className="w-full space-y-6">
         <div className="text-center pb-2">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#7B3B3B] mb-2 text-balance">
             Seus Convites
           </h2>
           <p className="text-base sm:text-lg text-[#8B6B6B] font-medium">{grupo.name}</p>
-          <p className="text-sm text-[#8B6B6B] mt-1">Esses são os convidados reservados para você 💕</p>
+          <p className="text-sm text-[#8B6B6B] mt-1">A confirmação deve ser feita apenas para as pessoas listadas abaixo.</p>
         </div>
 
         <div className="space-y-4">
@@ -274,8 +313,31 @@ function GroupSlide({ grupo }) {
                       </div>
                     </div>
 
-                    <div className="pr-2 opacity-40 group-hover:opacity-60 transition-opacity flex-shrink-0">
-                      <Sparkles size={26} className="text-[#E9B7BD]" />
+                    <div className="pr-2 flex-shrink-0">
+                      <div
+                        role="radiogroup"
+                        aria-label={`Status de presença de ${pessoa.name}`}
+                        className="inline-flex items-center gap-1 bg-white/80 border-2 border-[#EAB9BF]/60 rounded-full p-1 shadow-sm"
+                      >
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={statuses[idx] === "confirmado"}
+                          onClick={() => onChangeStatus(idx, "confirmado")}
+                          className={`${statuses[idx] === "confirmado" ? "bg-[#8FB59A] text-white border border-[#8FB59A]" : "border border-[#D1B5B0] text-[#7B3B3B] hover:bg-[#F7ECEB]"} px-3 py-1.5 rounded-full text-sm font-semibold transition`}
+                        >
+                          Vai
+                        </button>
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={statuses[idx] === "nao"}
+                          onClick={() => onChangeStatus(idx, "nao")}
+                          className={`${statuses[idx] === "nao" ? "bg-[#E9B7BD] text-white border border-[#E9B7BD]" : "border border-[#D1B5B0] text-[#7B3B3B] hover:bg-[#F7ECEB]"} px-3 py-1.5 rounded-full text-sm font-semibold transition`}
+                        >
+                          Não vai
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -289,13 +351,25 @@ function GroupSlide({ grupo }) {
           )}
         </div>
 
-        <div className="mt-8 text-center bg-gradient-to-br from-white to-[#FFF9F8] rounded-2xl sm:rounded-3xl p-6 sm:p-7 border-2 border-white/80 shadow-xl">
-          <p className="text-xs sm:text-sm text-[#8B6B6B]/80 uppercase tracking-widest mb-3 font-bold">
-            Total de Ingressos
+        <div className="bg-[#FFF4F4] border-2 border-[#E9B7BD] rounded-2xl p-4 text-center">
+          <p className="text-sm font-semibold text-[#7B3B3B]">⚠️ Importante</p>
+          <p className="text-xs sm:text-sm text-[#8B6B6B] mt-1">
+            A entrada é válida apenas para os convidados listados acima.
+            <br />
+            Não será possível levar acompanhantes extras.
           </p>
-          <div className="flex items-center justify-center gap-3">
-            <p className="text-5xl sm:text-6xl font-black text-[#7B3B3B]">{convidados.length}</p>
-            <Users className="w-8 h-8 sm:w-10 sm:h-10 text-[#E9B7BD]" />
+        </div>
+
+        <div className="mt-4 text-center bg-white rounded-2xl p-5 border-2 border-white/80 shadow-sm">
+          <div className="flex items-center justify-center gap-6">
+            <div>
+              <p className="text-xs sm:text-sm text-[#8B6B6B] uppercase tracking-widest font-bold">Confirmados</p>
+              <p className="text-3xl sm:text-4xl font-black text-[#7B3B3B]">{confirmados}</p>
+            </div>
+            <div>
+              <p className="text-xs sm:text-sm text-[#8B6B6B] uppercase tracking-widest font-bold">Não irão</p>
+              <p className="text-3xl sm:text-4xl font-black text-[#7B3B3B]">{ausentes}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -303,71 +377,7 @@ function GroupSlide({ grupo }) {
   )
 }
 
-function ConfirmationSlide({ confirmed, onConfirm }) {
-  return (
-    <div className="min-h-[calc(100dvh-200px)] flex items-center justify-center px-4 sm:px-6 py-8 w-full max-w-2xl md:max-w-3xl mx-auto">
-      <div className="w-full">
-        {!confirmed ? (
-          <div className="bg-white/90 backdrop-blur-xl rounded-3xl sm:rounded-[3rem] border-2 border-white/80 p-8 sm:p-12 text-center shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#FFF5F6] to-transparent opacity-40 z-0" />
-
-            <div className="relative z-10 space-y-8">
-              <div className="w-32 h-32 sm:w-36 sm:h-36 bg-gradient-to-br from-white to-[#FFF9F8] rounded-full mx-auto flex items-center justify-center shadow-2xl mb-6 border-4 border-[#E9B7BD]/20">
-                <PartyPopper className="w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] text-[#E9B7BD] animate-wiggle" strokeWidth={2} />
-              </div>
-
-              <div>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#7B3B3B] mb-5 text-balance">
-                  Vai comparecer?
-                </h2>
-                <p className="text-[#8B6B6B] leading-relaxed text-base sm:text-lg max-w-md mx-auto">
-                  Sua confirmação garante os lugares e o buffet 🍰
-                </p>
-              </div>
-
-              <button
-                onClick={onConfirm}
-                className="w-full group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#E9B7BD] via-[#D59B83] to-[#E9B7BD] bg-size-200 p-6 sm:p-7 text-white shadow-2xl transition-all hover:bg-pos-100 hover:scale-[1.03] active:scale-[0.97] animate-gradient"
-              >
-                <span className="relative flex items-center justify-center gap-3 font-bold text-xl sm:text-2xl">
-                  <CheckCircle size={30} strokeWidth={2.5} />
-                  Confirmar Presença
-                </span>
-              </button>
-
-              <p className="text-xs sm:text-sm text-[#8B6B6B]/60 italic">Toque no botão acima para confirmar</p>
-            </div>
-          </div>
-        ) : (
-          <div className="relative">
-            <div className="bg-gradient-to-br from-[#8FB59A]/25 to-[#7EA88E]/15 backdrop-blur-xl rounded-3xl sm:rounded-[3rem] border-2 border-[#8FB59A]/50 p-8 sm:p-12 text-center shadow-2xl">
-              <div role="status" aria-live="polite" className="sr-only">Confirmação enviada com sucesso</div>
-              <div className="w-28 h-28 sm:w-32 sm:h-32 bg-[#8FB59A] rounded-full mx-auto flex items-center justify-center shadow-2xl mb-8 animate-bounce-once border-4 border-white/50">
-                <CheckCircle className="w-14 h-14 sm:w-16 sm:h-16 text-white" strokeWidth={3} />
-              </div>
-
-              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-[#5A7A64] mb-5">
-                Obrigado por confirmar!
-              </h2>
-              <p className="text-[#6B8B74] text-base sm:text-lg mb-8 max-w-md mx-auto leading-relaxed">
-                Que alegria ter você conosco! Já separamos seu lugar. Nos vemos lá!
-              </p>
-
-              <div className="bg-white/90 rounded-2xl sm:rounded-3xl p-7 sm:p-8 text-[#5A7A64] border-2 border-[#8FB59A]/40 shadow-xl">
-                <p className="font-bold text-lg sm:text-xl mb-4 flex items-center justify-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  Lembrete Final
-                </p>
-                <p className="text-base sm:text-lg font-bold text-[#7B3B3B] mb-2">28 de Fevereiro • 13h00</p>
-                <p className="text-sm sm:text-base mt-2 text-[#8B6B6B]">Buffet Jokempô, Vila Industrial</p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
+// ConfirmationSlide removido: confirmação agora é feita em "Seus Convites"
 
 function Preloader({ onComplete }) {
   const [isVisible, setIsVisible] = useState(true)
@@ -519,8 +529,8 @@ export default function Welcome() {
   const guestName = grupo.name || ""
   const [showPreloader, setShowPreloader] = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [confirmed, setConfirmed] = useState(false)
-  const [showConfetti, setShowConfetti] = useState(false)
+  const [groupStatuses, setGroupStatuses] = useState(() => (grupo.convidados || []).map(() => "confirmado"))
+  
   const touchStartX = useRef(0)
   const touchEndX = useRef(0)
 
@@ -528,18 +538,13 @@ export default function Welcome() {
     { Icon: PartyPopper, label: "Convite" },
     { Icon: ClipboardList, label: "Informações" },
     { Icon: Users, label: "Convidados" },
-    { Icon: CheckCircle, label: "Confirmação" },
+    { Icon: CheckCircle, label: "Obrigado" },
   ]
   const totalSlides = slidesTitles.length
 
-  const handleConfirm = () => {
-    setConfirmed(true)
-    setShowConfetti(true)
-    setTimeout(() => setShowConfetti(false), 5000)
-  }
-
   const goToSlide = (index) => {
-    if (index >= 0 && index < totalSlides) {
+    // Não permitir pular etapas: só voltar ou permanecer na atual
+    if (index >= 0 && index < totalSlides && index <= currentSlide) {
       setCurrentSlide(index)
     }
   }
@@ -632,29 +637,29 @@ export default function Welcome() {
 
       <EventHeader onShare={handleShare} />
 
-      {showConfetti && <Confetti />}
+      
 
-      <main className="flex-1 relative z-10 overflow-y-auto overflow-x-hidden scroll-smooth pb-28 sm:pb-32 pt-20 sm:pt-24">
+      <main className="flex-1 relative z-10 overflow-hidden pb-28 sm:pb-32 pt-20 sm:pt-24">
         <div className="transition-opacity duration-300 animate-fade-in">
           {currentSlide === 0 && <ConviteSlide />}
           {currentSlide === 1 && <InstructionsSlide />}
-          {currentSlide === 2 && <GroupSlide grupo={grupo} />}
-          {currentSlide === 3 && <ConfirmationSlide confirmed={confirmed} onConfirm={handleConfirm} />}
+          {currentSlide === 2 && (
+            <GroupSlide
+              grupo={grupo}
+              statuses={groupStatuses}
+              onChangeStatus={(i, value) =>
+                setGroupStatuses((prev) => {
+                  const next = [...prev]
+                  next[i] = value
+                  return next
+                })
+              }
+            />
+          )}
+          {currentSlide === 3 && <ThankYouSlide statuses={groupStatuses} />}
         </div>
       </main>
 
-      {currentSlide >= 2 && currentSlide !== totalSlides - 1 && (
-        <button
-          type="button"
-          onClick={() => goToSlide(totalSlides - 1)}
-          aria-label="Ir para confirmação"
-          title="Confirmar presença"
-          className="fixed z-40 right-4 sm:right-6 bottom-24 sm:bottom-28 inline-flex items-center gap-2 px-4 py-2 rounded-full text-white bg-gradient-to-r from-[#D59B83] to-[#E9B7BD] shadow-xl hover:scale-[1.03] active:scale-[0.98] transition-transform"
-        >
-          <CheckCircle className="w-5 h-5" />
-          <span className="font-bold text-sm">Confirmar</span>
-        </button>
-      )}
 
       <div className="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-[#F7F1EF] via-[#F7F1EF] to-transparent pt-4 pb-6 pb-safe px-4">
         <div className="max-w-2xl md:max-w-3xl mx-auto">
@@ -662,9 +667,11 @@ export default function Welcome() {
             {slidesTitles.map((_, index) => (
               <button
                 key={index}
-                onClick={() => goToSlide(index)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${index === currentSlide ? "w-12 bg-[#7B3B3B]" : "w-8 bg-[#D59B83]/30 hover:bg-[#D59B83]/50"
-                  }`}
+                // Desabilita cliques em passos futuros para não pular etapas
+                disabled={index > currentSlide}
+                aria-disabled={index > currentSlide}
+                onClick={index > currentSlide ? undefined : () => goToSlide(index)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${index === currentSlide ? "w-12 bg-[#7B3B3B]" : "w-8 bg-[#D59B83]/30"} ${index > currentSlide ? "opacity-50 cursor-not-allowed" : "hover:bg-[#D59B83]/50"}`}
                 aria-label={`Ir para ${slidesTitles[index].label}`}
               />
             ))}
@@ -686,16 +693,19 @@ export default function Welcome() {
             <div className="flex-1 flex items-center justify-center gap-3 px-2">
               {slidesTitles.map((slide, index) => {
                 const isActive = currentSlide === index
+                const isDisabled = index > currentSlide
                 return (
                   <button
                     key={index}
-                    onClick={() => goToSlide(index)}
+                    // Não permite pular etapas clicando diretamente em passos futuros
+                    disabled={isDisabled}
+                    aria-disabled={isDisabled}
+                    onClick={isDisabled ? undefined : () => goToSlide(index)}
                     aria-current={isActive ? "step" : undefined}
                     title={`${slide.label}`}
                     className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full transition-all ${isActive
                       ? "bg-gradient-to-r from-[#7B3B3B] to-[#5A2D2D] text-white shadow-md scale-105"
-                      : "bg-transparent text-[#8B6B6B] hover:bg-[#F5D1A3]/20"
-                      }`}
+                      : "bg-transparent text-[#8B6B6B]"} ${isDisabled ? "opacity-50 cursor-not-allowed" : "hover:bg-[#F5D1A3]/20"}`}
                   >
                     <slide.Icon className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2} />
                     <span className="hidden sm:inline text-sm font-bold">{slide.label}</span>
