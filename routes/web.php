@@ -3,11 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+use App\Http\Controllers\GiftController;
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -16,9 +12,8 @@ Route::middleware('auth')->group(function () {
 });
 
 
-use App\Http\Controllers\GiftController;
 
-Route::get('/presentes', [GiftController::class, 'index'])->name('gifts.index');
+
 Route::post('/presentes/reservar', [GiftController::class, 'reserve'])->name('gifts.reserve');
 
 require __DIR__ . '/auth.php';
