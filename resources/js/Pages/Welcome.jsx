@@ -1,733 +1,232 @@
 "use client"
 
-import { useState, useMemo, useRef, useEffect } from "react"
-import {
-  Calendar,
-  Clock,
-  Users,
-  User,
-  Baby,
-  AlertCircle,
-  Sparkles,
-  PartyPopper,
-  ChevronLeft,
-  ChevronRight,
-  ClipboardList,
-  CheckCircle,
-  Cake,
-  MapPin,
-} from "lucide-react"
 
-function NoiseTexture() {
-  return (
-    <div
-      className="pointer-events-none fixed inset-0 z-0 opacity-[0.015]"
-      style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-      }}
-    />
-  )
+import { useState } from "react"
+import { Gift, Check, Heart, Sparkles, Star } from "lucide-react"
+import { cn } from "@/lib/utils"
+
+const initialGifts = [
+  { id: 1, name: "Boneca Baby Alive", description: "Boneca que come e bebe", category: "Brinquedos", reserved: false },
+  { id: 2, name: "Casinha de Bonecas", description: "Casinha com móveis e acessórios", category: "Brinquedos", reserved: false },
+  { id: 3, name: "Conjunto de Massinhas", description: "Play-Doh com formas divertidas", category: "Brinquedos", reserved: false },
+  { id: 4, name: "Livros Infantis", description: "Coleção de histórias ilustradas", category: "Educativos", reserved: false },
+  { id: 5, name: "Blocos de Montar", description: "Lego Duplo colorido", category: "Educativos", reserved: false },
+  { id: 6, name: "Bicicleta Rosa", description: "Com rodinhas laterais", category: "Brinquedos", reserved: false },
+  { id: 7, name: "Kit de Pintura", description: "Tintas, pincéis e aventais", category: "Arte", reserved: false },
+  { id: 8, name: "Fantasia de Princesa", description: "Vestido com coroa e varinha", category: "Fantasias", reserved: false },
+  { id: 9, name: "Pelúcia Unicórnio", description: "Grande e fofinho", category: "Pelúcias", reserved: false },
+  { id: 10, name: "Quebra-Cabeça", description: "50 peças com animais", category: "Educativos", reserved: false },
+  { id: 11, name: "Mini Cozinha", description: "Com acessórios de cozinha", category: "Brinquedos", reserved: false },
+  { id: 12, name: "Patinete", description: "Com 3 rodas e luzes", category: "Brinquedos", reserved: false },
+]
+
+const categoryColors = {
+  "Brinquedos": "bg-primary/20 text-primary",
+  "Educativos": "bg-accent/30 text-accent-foreground",
+  "Arte": "bg-secondary text-secondary-foreground",
+  "Fantasias": "bg-chart-4/20 text-chart-4",
+  "Pelúcias": "bg-chart-5/20 text-chart-5",
 }
 
-function ThankYouSlide({ statuses }) {
-  const confirmados = (statuses || []).filter((s) => s === "confirmado").length
-  const ausentes = (statuses || []).filter((s) => s === "nao").length
-  const vai = confirmados > 0
-
-  return (
-    <section className="min-h-[calc(100dvh-200px)] flex items-center justify-center px-4 sm:px-6 w-full">
-      <div className={`w-full max-w-2xl md:max-w-3xl text-center bg-white/90 backdrop-blur-xl rounded-3xl border-2 border-white/80 p-8 sm:p-12 shadow-2xl`}>
-        <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full mx-auto flex items-center justify-center shadow-2xl mb-6 ${vai ? "bg-[#8FB59A]" : "bg-[#E9B7BD]"}`}>
-          <CheckCircle className="w-14 h-14 sm:w-16 sm:h-16 text-white" strokeWidth={3} />
-        </div>
-
-        <h2 className="text-4xl sm:text-5xl font-serif font-bold text-[#7B3B3B] mb-4">
-          Obrigado!
-        </h2>
-        <p className="text-[#8B6B6B] text-base sm:text-lg mb-6 max-w-md mx-auto leading-relaxed">
-          {vai
-            ? `Que alegria ter você conosco! Reservamos lugares para ${confirmados} ${confirmados === 1 ? "pessoa" : "pessoas"}.`
-            : "Entendemos. Sentiremos sua falta — esperamos você numa próxima!"}
-        </p>
-
-        <div className="bg-white rounded-2xl p-6 border-2 border-white/80 shadow">
-          <div className="flex items-center justify-center gap-6">
-            <div>
-              <p className="text-xs sm:text-sm text-[#8B6B6B] uppercase tracking-widest font-bold">Confirmados</p>
-              <p className="text-3xl sm:text-4xl font-black text-[#7B3B3B]">{confirmados}</p>
-            </div>
-            <div>
-              <p className="text-xs sm:text-sm text-[#8B6B6B] uppercase tracking-widest font-bold">Não irão</p>
-              <p className="text-3xl sm:text-4xl font-black text-[#7B3B3B]">{ausentes}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-function Confetti() {
-  const prefersReduced =
-    typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-  const count = prefersReduced ? 0 : isMobile ? 30 : 60
-  const pieces = useMemo(
-    () =>
-      Array.from({ length: count }, (_, i) => ({
-        id: i,
-        left: Math.random() * 100,
-        delay: Math.random() * 0.8,
-        duration: 2.5 + Math.random() * 2,
-        rotation: Math.random() * 360,
-        color: ["#F0C6C8", "#E9B7BD", "#8FB59A", "#D59B83", "#F5D1A3"][Math.floor(Math.random() * 5)],
-      })),
-    [count],
-  )
-
-  return (
-    <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
-      {pieces.map((p) => (
-        <span
-          key={p.id}
-          className="absolute -top-4 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm animate-confetti-fall"
-          style={{
-            left: `${p.left}%`,
-            backgroundColor: p.color,
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.duration}s`,
-            transform: `rotate(${p.rotation}deg)`,
-          }}
-        />
-      ))}
-    </div>
-  )
+const categoryIcons = {
+  "Brinquedos": "🎀",
+  "Educativos": "📚",
+  "Arte": "🎨",
+  "Fantasias": "👸",
+  "Pelúcias": "🧸",
 }
 
-function IntroPurposeSlide() {
+
+export function GiftList() {
+  const [gifts, setGifts] = useState(initialGifts)
+  const [selectedGift, setSelectedGift] = useState(null)
+  const [guestName, setGuestName] = useState("")
+  const [showModal, setShowModal] = useState(false)
+  const [filter, setFilter] = useState("Todos")
+
+  const categories = ["Todos", ...Array.from(new Set(initialGifts.map(g => g.category)))]
+
+  const filteredGifts = filter === "Todos" 
+    ? gifts 
+    : gifts.filter(g => g.category === filter)
+
+  const handleReserve = () => {
+    if (!selectedGift || !guestName.trim()) return
+    setGifts(prev => prev.map(gift => 
+      gift.id === selectedGift.id 
+        ? { ...gift, reserved: true, reservedBy: guestName }
+        : gift
+    ))
+    setShowModal(false)
+    setSelectedGift(null)
+    setGuestName("")
+  }
+
+  const reservedCount = gifts.filter(g => g.reserved).length
+
   return (
-    <section className="min-h-[calc(100dvh-200px)] flex items-center justify-center px-6 py-8 w-full">
-      <div className="bg-white/95 backdrop-blur-sm rounded-[2rem] border-2 border-white/80 shadow-2xl p-8 sm:p-10 max-w-xl w-full text-center space-y-6">
-        <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#E9B7BD] to-[#D59B83] flex items-center justify-center shadow-xl">
-          <PartyPopper className="w-10 h-10 text-white" />
-        </div>
-
-        <h1 className="text-3xl sm:text-4xl font-serif font-black text-[#7B3B3B]">Você foi convidado 💖</h1>
-
-        <p className="text-base sm:text-lg text-[#8B6B6B] leading-relaxed">
-          Preparamos tudo com carinho para você.
-          <br />
-          Em poucos passos, confirme sua presença no aniversário da <strong>Sarah Lorraine</strong>.
-          <br />
-          <span className="font-bold text-[#7B3B3B]">É rápido e muito importante para nós ✨</span>
-        </p>
-
-        <p className="text-xs text-[#7B3B3B] font-bold tracking-widest animate-pulse">👉 Deslize para continuar</p>
-      </div>
-    </section>
-  )
-}
-
-function ConviteSlide() {
-  return (
-    <section className="min-h-[calc(100dvh-200px)] flex items-center justify-center px-6 py-6 w-full">
-      <div className="bg-white/95 backdrop-blur-sm rounded-[2rem] border-2 border-white/80 shadow-2xl p-8 sm:p-10 max-w-xl w-full text-center space-y-6">
-        <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#E9B7BD] to-[#D59B83] flex items-center justify-center shadow-xl">
-          <PartyPopper className="w-10 h-10 text-white" />
-        </div>
-
-        <h1 className="text-3xl sm:text-4xl font-serif font-black text-[#7B3B3B]">Você foi convidado 💖</h1>
-
-        <p className="text-base sm:text-lg text-[#8B6B6B] leading-relaxed">
-          É com muito carinho que convidamos você para o aniversário da
-          <br />
-          <strong>Sarah Lorraine</strong> 🎉
-        </p>
-
-        <div className="bg-white rounded-2xl border-2 border-white/80 shadow-sm p-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <span className="inline-flex items-center gap-1.5 text-[#7B3B3B] text-xs sm:text-sm font-bold bg-[#F7ECEB] border border-[#E9B7BD]/40 px-3 py-1.5 rounded-full shadow-sm">
-            <Calendar className="w-3.5 h-3.5" /> 28 de Fevereiro • 13h
-          </span>
-          <span className="inline-flex items-center gap-1.5 text-[#8B6B6B] text-xs sm:text-sm font-semibold bg-white border border-[#F5D1A3]/40 px-3 py-1.5 rounded-full shadow-sm">
-            <MapPin className="w-3.5 h-3.5 text-[#D59B83]" /> Buffet Jokempô – Vila Industrial
+    <div className="space-y-8">
+      {/* Stats */}
+      <div className="flex flex-wrap justify-center gap-4">
+        <div className="flex items-center gap-2 rounded-full bg-card px-6 py-3 shadow-md">
+          <Gift className="h-5 w-5 text-primary" />
+          <span className="font-medium text-card-foreground">
+            {gifts.length - reservedCount} disponíveis
           </span>
         </div>
-
-        
-      </div>
-    </section>
-  )
-}
-
-function WelcomeSlide({ guestName }) {
-  const displayName = guestName || "convidado"
-
-  return (
-    <section
-      role="region"
-      aria-label="Bem-vindo"
-      className="flex flex-col items-center justify-center min-h-[calc(100dvh-200px)] px-6 py-8 w-full max-w-2xl md:max-w-3xl mx-auto"
-    >
-      <div className="relative w-full bg-white/95 backdrop-blur-sm border-2 border-white/80 rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl p-6 sm:p-8 overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#E9B7BD] via-[#F5D1A3] to-[#8FB59A]" />
-
-        <div className="relative z-10 text-center space-y-6 sm:space-y-8">
-          <div className="mx-auto w-full max-w-xl">
-            <h1 className="text-4xl sm:text-5xl font-serif font-black text-[#7B3B3B] leading-tight">
-              Olá, {displayName}! 🎉
-            </h1>
-            <p className="mt-2 text-base sm:text-lg text-[#8B6B6B]">
-              Preparamos tudo com carinho para você. Deslize para ver os detalhes 💖
-            </p>
-            <div className="mt-4 inline-flex items-center gap-1.5 text-[#7B3B3B] text-xs sm:text-sm font-bold bg-[#F7ECEB] border border-[#E9B7BD]/40 px-3 py-1.5 rounded-full shadow-sm">
-              <Calendar className="w-3.5 h-3.5" /> 28 de Fevereiro • 13h00 • Buffet Jokempô
-            </div>
-          </div>
+        <div className="flex items-center gap-2 rounded-full bg-card px-6 py-3 shadow-md">
+          <Heart className="h-5 w-5 text-chart-5" />
+          <span className="font-medium text-card-foreground">
+            {reservedCount} reservados
+          </span>
         </div>
       </div>
-    </section>
-  )
-}
 
-function InstructionsSlide() {
-  const schedule = [
-    { Icon: Clock, hora: "1ª hora", title: "Recepção", desc: "Crianças livres para brincar à vontade" },
-    { Icon: Users, hora: "2ª hora", title: "Piquenique", desc: "Hora de comer e brincar junto" },
-    { Icon: Cake, hora: "3ª hora", title: "Parabéns", desc: "O momento mais especial" },
-    { Icon: Sparkles, hora: "4ª hora", title: "Despedida", desc: "Últimas brincadeiras e diversão" },
-  ]
-
-  return (
-    <div className="min-h-[calc(100dvh-200px)] flex items-center justify-center px-3 sm:px-4 py-4 w-full max-w-2xl md:max-w-3xl mx-auto">
-      <div className="w-full space-y-4">
-        <div className="relative bg-white/95 backdrop-blur-sm rounded-xl p-3 sm:p-4 border-2 border-white/80 shadow-sm overflow-hidden">
-          <div className="absolute -right-6 -top-8 w-28 h-28 bg-gradient-to-br from-[#E9B7BD]/18 to-transparent rounded-full blur-2xl pointer-events-none" />
-          <div className="absolute -left-6 -bottom-8 w-28 h-28 bg-gradient-to-br from-[#8FB59A]/18 to-transparent rounded-full blur-2xl pointer-events-none" />
-
-          <div className="relative z-10">
-            <div className="flex items-start gap-2 mb-3">
-              <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-[#E9B7BD] via-[#D59B83] to-[#8FB59A]" />
-              <div>
-                <h3 className="text-[#7B3B3B] font-serif font-bold text-lg sm:text-xl">Como será o dia</h3>
-                <p className="text-xs sm:text-xs text-[#8B6B6B] font-medium mt-1">Horário: 13h às 17h</p>
-              </div>
-            </div>
-
-            <div className="mt-3 relative">
-              <div className="absolute left-6 top-6 bottom-6 w-px bg-gradient-to-b from-[#E9B7BD]/35 to-transparent" />
-
-              <ul className="space-y-4">
-                {schedule.map((item, i) => (
-                  <li key={i} className="relative pl-16 sm:pl-20">
-                    <div className="absolute left-0 top-1">
-                      <div className="w-10 h-10 rounded-full bg-white border border-[#EAB9BF]/40 flex items-center justify-center shadow-sm">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center bg-white/80">
-                          <item.Icon size={14} strokeWidth={1.6} className="text-[#7B3B3B]" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-md p-3 shadow-sm border border-[#F2D8D8]/60 hover:shadow-md transition">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <span className="inline-block text-xs font-semibold text-[#7B3B3B] bg-[#F7ECEB] border border-[#E9B7BD]/40 px-2 py-1 rounded-md shadow-sm">
-                            {item.hora}
-                          </span>
-                          <h4 id={`sched-title-${i}`} className="text-[#7B3B3B] font-bold text-sm sm:text-sm">
-                            {item.title}
-                          </h4>
-                        </div>
-                      </div>
-                      <p className="text-sm text-[#8B6B6B] mt-2 max-w-xl">{item.desc}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-r from-[#F5D1A3]/20 to-[#E9B7BD]/18 rounded-md p-3 flex gap-3 border-2 border-[#F5D1A3]/35 items-start">
-          <AlertCircle className="w-5 h-5 text-[#D59B83] flex-shrink-0 mt-1" strokeWidth={1.6} />
-          <div>
-            <p className="text-sm text-[#7B3B3B]">
-              <strong className="font-bold">Importante:</strong> Chegue no horário para que as crianças aproveitem todas
-              as atrações e para que a programação ocorra conforme planejado.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function GroupSlide({ grupo, statuses, onChangeStatus }) {
-  const convidados = grupo?.convidados || []
-  const confirmados = (statuses || []).filter((s) => s === "confirmado").length
-  const ausentes = (statuses || []).filter((s) => s === "nao").length
-
-  return (
-    <div className="h-[calc(100dvh-200px)] flex items-center justify-center px-4 sm:px-6 w-full max-w-2xl md:max-w-3xl mx-auto">
-      <div className="w-full space-y-6">
-        <div className="text-center pb-2">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#7B3B3B] mb-2 text-balance">
-            Seus Convites
-          </h2>
-          <p className="text-base sm:text-lg text-[#8B6B6B] font-medium">{grupo.name}</p>
-          <p className="text-sm text-[#8B6B6B] mt-1">A confirmação deve ser feita apenas para as pessoas listadas abaixo.</p>
-        </div>
-
-        <div className="space-y-4">
-          {convidados.length > 0 ? (
-            convidados.map((pessoa, idx) => {
-              const isCrianca = pessoa.isCrianca && pessoa.isCrianca.age != null
-
-              return (
-                <div key={idx} className="relative group">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl sm:rounded-3xl border-2 border-[#EAB9BF]/50 p-5 sm:p-6 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-between gap-4">
-                    <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#F7F1EF] rounded-full border-r-4 border-[#EAB9BF]/50" />
-                    <div className="absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#F7F1EF] rounded-full border-l-4 border-[#EAB9BF]/50" />
-
-                    <div className="flex items-center gap-5 pl-3">
-                      <div
-                        className={`w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] rounded-2xl sm:rounded-3xl flex items-center justify-center text-white shadow-lg ${isCrianca
-                          ? "bg-gradient-to-br from-[#8FB59A] to-[#7EA88E]"
-                          : "bg-gradient-to-br from-[#D59B83] to-[#C58973]"
-                          }`}
-                      >
-                        {isCrianca ? <Baby size={32} strokeWidth={2} /> : <User size={32} strokeWidth={2} />}
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-[#7B3B3B] text-lg sm:text-xl leading-tight mb-1.5">
-                          {pessoa.name}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-[#8B6B6B] uppercase tracking-wider font-bold flex items-center gap-2">
-                          {isCrianca ? (
-                            <>
-                              <Cake className="w-3.5 h-3.5" />
-                              {pessoa.isCrianca.age} anos
-                            </>
-                          ) : (
-                            "Adulto"
-                          )}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="pr-2 flex-shrink-0">
-                      <div
-                        role="radiogroup"
-                        aria-label={`Status de presença de ${pessoa.name}`}
-                        className="inline-flex items-center gap-1 bg-white/80 border-2 border-[#EAB9BF]/60 rounded-full p-1 shadow-sm"
-                      >
-                        <button
-                          type="button"
-                          role="radio"
-                          aria-checked={statuses[idx] === "confirmado"}
-                          onClick={() => onChangeStatus(idx, "confirmado")}
-                          className={`${statuses[idx] === "confirmado" ? "bg-[#8FB59A] text-white border border-[#8FB59A]" : "border border-[#D1B5B0] text-[#7B3B3B] hover:bg-[#F7ECEB]"} px-3 py-1.5 rounded-full text-sm font-semibold transition`}
-                        >
-                          Vai
-                        </button>
-                        <button
-                          type="button"
-                          role="radio"
-                          aria-checked={statuses[idx] === "nao"}
-                          onClick={() => onChangeStatus(idx, "nao")}
-                          className={`${statuses[idx] === "nao" ? "bg-[#E9B7BD] text-white border border-[#E9B7BD]" : "border border-[#D1B5B0] text-[#7B3B3B] hover:bg-[#F7ECEB]"} px-3 py-1.5 rounded-full text-sm font-semibold transition`}
-                        >
-                          Não vai
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )
-            })
-          ) : (
-            <div className="text-center py-16 bg-white/50 rounded-3xl border-2 border-dashed border-[#D59B83]/40">
-              <Users className="w-16 h-16 text-[#D59B83]/50 mx-auto mb-3" />
-              <p className="text-[#8B6B6B] text-lg">Nenhum convidado listado</p>
-            </div>
-          )}
-        </div>
-
-        <div className="bg-[#FFF4F4] border-2 border-[#E9B7BD] rounded-2xl p-4 text-center">
-          <p className="text-sm font-semibold text-[#7B3B3B]">⚠️ Importante</p>
-          <p className="text-xs sm:text-sm text-[#8B6B6B] mt-1">
-            A entrada é válida apenas para os convidados listados acima.
-            <br />
-            Não será possível levar acompanhantes extras.
-          </p>
-        </div>
-
-        <div className="mt-4 text-center bg-white rounded-2xl p-5 border-2 border-white/80 shadow-sm">
-          <div className="flex items-center justify-center gap-6">
-            <div>
-              <p className="text-xs sm:text-sm text-[#8B6B6B] uppercase tracking-widest font-bold">Confirmados</p>
-              <p className="text-3xl sm:text-4xl font-black text-[#7B3B3B]">{confirmados}</p>
-            </div>
-            <div>
-              <p className="text-xs sm:text-sm text-[#8B6B6B] uppercase tracking-widest font-bold">Não irão</p>
-              <p className="text-3xl sm:text-4xl font-black text-[#7B3B3B]">{ausentes}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ConfirmationSlide removido: confirmação agora é feita em "Seus Convites"
-
-function Preloader({ onComplete }) {
-  const [isVisible, setIsVisible] = useState(true)
-  const [step, setStep] = useState(1)
-
-  useEffect(() => {
-    const t1 = setTimeout(() => setStep(2), 3000)
-    const t2 = setTimeout(() => {
-      setIsVisible(false)
-      setTimeout(onComplete, 500)
-    }, 6000)
-
-    return () => {
-      clearTimeout(t1)
-      clearTimeout(t2)
-    }
-  }, [onComplete])
-
-  const confettiPieces = useMemo(
-    () =>
-      Array.from({ length: 40 }, (_, i) => ({
-        id: i,
-        left: Math.random() * 100,
-        delay: Math.random() * 2,
-        duration: 2 + Math.random() * 1.5,
-        rotation: Math.random() * 360,
-        color: ["#F0C6C8", "#E9B7BD", "#8FB59A", "#D59B83", "#F5D1A3"][Math.floor(Math.random() * 5)],
-      })),
-    [],
-  )
-
-  return (
-    <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-[#FFF9F8] via-[#FFF5F6] to-[#FFF0F2] transition-opacity duration-500 ${isVisible ? "opacity-100" : "opacity-0"
-        }`}
-    >
-      {/* Confetes */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {confettiPieces.map((p) => (
-          <span
-            key={p.id}
-            className="absolute -top-4 w-2 h-2 rounded-sm animate-confetti-fall opacity-30"
-            style={{
-              left: `${p.left}%`,
-              backgroundColor: p.color,
-              animationDelay: `${p.delay}s`,
-              animationDuration: `${p.duration}s`,
-              transform: `rotate(${p.rotation}deg)`,
-            }}
-          />
+      {/* Category Filter */}
+      <div className="flex flex-wrap justify-center gap-2">
+        {categories.map((category) => (
+          <button
+            type="button"
+            key={category}
+            onClick={() => setFilter(category)}
+            className={cn(
+              "rounded-full px-4 py-2 text-sm font-medium transition-all",
+              filter === category
+                ? "bg-primary text-primary-foreground shadow-lg scale-105"
+                : "bg-card text-card-foreground hover:bg-primary/10"
+            )}
+          >
+            {category !== "Todos" && categoryIcons[category]} {category}
+          </button>
         ))}
       </div>
 
-      {/* Glow */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#E9B7BD]/10 rounded-full blur-3xl animate-pulse-slow" />
-        <div
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#8FB59A]/10 rounded-full blur-3xl animate-pulse-slow"
-          style={{ animationDelay: "1s" }}
-        />
-      </div>
-
-      {/* Conteúdo CENTRALIZADO */}
-      <div className="relative z-10 w-full h-full flex items-center justify-center px-6">
-        <div className="relative w-full max-w-4xl flex flex-col items-center justify-center text-center">
-          {/* STEP 1 - ocupa exatamente a mesma âncora */}
+      {/* Gift Grid */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredGifts.map((gift, index) => (
           <div
-            className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-700 ${step === 1 ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            key={gift.id}
+            className={cn(
+              "group relative overflow-hidden rounded-2xl bg-card p-5 shadow-md transition-all duration-300",
+              gift.reserved 
+                ? "opacity-70" 
+                : "hover:shadow-xl hover:scale-[1.02] cursor-pointer"
+            )}
+            style={{ animationDelay: `${index * 50}ms` }}
+            onClick={() => {
+              if (!gift.reserved) {
+                setSelectedGift(gift)
+                setShowModal(true)
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !gift.reserved) {
+                setSelectedGift(gift)
+                setShowModal(true)
+              }
+            }}
+            role="button"
+            tabIndex={gift.reserved ? -1 : 0}
           >
-            <div className="mb-8">
-              <div className="relative">
-                <div className="w-24 h-24 bg-gradient-to-br from-[#E9B7BD] to-[#D59B83] rounded-full flex items-center justify-center shadow-2xl animate-float">
-                  <PartyPopper className="w-12 h-12 text-white" />
-                </div>
-                <div className="absolute -inset-2 bg-[#E9B7BD]/30 rounded-full blur-xl animate-pulse" />
-              </div>
+            {/* Decorative elements */}
+            <div className="absolute -right-2 -top-2 text-4xl opacity-20 transition-transform group-hover:scale-110">
+              {categoryIcons[gift.category]}
             </div>
+            
+            {/* Category Badge */}
+            <span className={cn(
+              "inline-block rounded-full px-3 py-1 text-xs font-medium",
+              categoryColors[gift.category]
+            )}>
+              {gift.category}
+            </span>
 
-            <p className="text-2xl sm:text-3xl text-[#8B6B6B] font-light">
-              Você está convidado para o aniversário da
+            {/* Content */}
+            <h3 className="mt-3 text-lg font-semibold text-card-foreground">
+              {gift.name}
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {gift.description}
             </p>
 
-            <div className="py-6">
-              <h1 className="text-6xl sm:text-7xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-[#7B3B3B] via-[#E9B7BD] to-[#7B3B3B]">
-                Sarah
-              </h1>
-              <p className="text-4xl sm:text-5xl text-[#E9B7BD] mt-3">Lorraine</p>
-            </div>
-
-            <div className="flex gap-2">
-              <Sparkles className="text-[#E9B7BD]" />
-              <Sparkles className="text-[#D59B83]" />
-              <Sparkles className="text-[#8FB59A]" />
-            </div>
+            {/* Status */}
+            {gift.reserved ? (
+              <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                <Check className="h-4 w-4 text-accent" />
+                <span>Reservado por {gift.reservedBy}</span>
+              </div>
+            ) : (
+              <div className="mt-4 flex items-center gap-2 text-sm text-primary">
+                <Sparkles className="h-4 w-4" />
+                <span className="font-medium">Clique para reservar</span>
+              </div>
+            )}
           </div>
+        ))}
+      </div>
 
-          {/* STEP 2 - mesmo ponto de ancoragem, apenas opacidade */}
-          <div
-            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${step === 2 ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+      {/* Modal */}
+      {showModal && selectedGift && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-4"
+          onClick={() => setShowModal(false)}
+          onKeyDown={(e) => e.key === 'Escape' && setShowModal(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div 
+            className="w-full max-w-md rounded-3xl bg-card p-8 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
           >
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white">
-              <CheckCircle className="w-16 h-16 mx-auto text-[#8FB59A] mb-4" />
-              <p className="text-3xl font-bold text-[#7B3B3B]">
-                Confirme sua presença
+            <div className="mb-6 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/20">
+                <Star className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-2xl font-bold text-card-foreground">
+                Reservar Presente
+              </h3>
+              <p className="mt-2 text-muted-foreground">
+                {selectedGift.name}
               </p>
-              <p className="text-lg text-[#8B6B6B] mt-2">
-                É rápido e nos ajuda muito 💖
-              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="guestName" className="block text-sm font-medium text-card-foreground mb-2">
+                  Seu nome
+                </label>
+                <input
+                  id="guestName"
+                  type="text"
+                  value={guestName}
+                  onChange={(e) => setGuestName(e.target.value)}
+                  placeholder="Digite seu nome..."
+                  className="w-full rounded-xl border-2 border-border bg-input px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 rounded-xl border-2 border-border px-4 py-3 font-medium text-card-foreground transition-colors hover:bg-muted"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleReserve}
+                  disabled={!guestName.trim()}
+                  className="flex-1 rounded-xl bg-primary px-4 py-3 font-medium text-primary-foreground transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Confirmar
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  )
-}
-
-function EventHeader({ onShare }) {
-  return (
-    <div className="fixed top-0 left-0 right-0 z-20 px-4 pt-safe pb-2">
-      <div className="max-w-2xl md:max-w-3xl mx-auto">
-        <div className="bg-white/80 backdrop-blur-md border-2 border-white/60 rounded-full px-3 py-2 flex items-center justify-between shadow-lg">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <span className="inline-flex items-center gap-1.5 text-[#7B3B3B] text-xs sm:text-sm font-bold bg-[#F7ECEB] border border-[#E9B7BD]/40 px-2.5 py-1 rounded-full shadow-sm whitespace-nowrap">
-              <Calendar className="w-3.5 h-3.5" /> 28 de Fevereiro • 13h00
-            </span>
-            <span className="hidden sm:inline-flex items-center gap-1.5 text-[#8B6B6B] text-xs font-semibold bg-white border border-[#F5D1A3]/40 px-2.5 py-1 rounded-full shadow-sm max-w-[220px] truncate">
-              <MapPin className="w-3.5 h-3.5 text-[#D59B83]" /> Buffet Jokempô, Vila Industrial
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export default function Welcome() {
-  const mockGrupo = {
-    name: "Família Silva",
-    telefone: "(11) 99999-9999",
-    convidados: [
-      { name: "João Silva", isCrianca: null },
-      { name: "Maria Silva", isCrianca: null },
-      { name: "Pedro Silva", isCrianca: { age: 5 } },
-      { name: "Ana Silva", isCrianca: { age: 8 } },
-    ],
-  }
-
-  const grupo = mockGrupo
-  const guestName = grupo.name || ""
-  const [showPreloader, setShowPreloader] = useState(true)
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [groupStatuses, setGroupStatuses] = useState(() => (grupo.convidados || []).map(() => "confirmado"))
-  
-  const touchStartX = useRef(0)
-  const touchEndX = useRef(0)
-
-  const slidesTitles = [
-    { Icon: PartyPopper, label: "Convite" },
-    { Icon: ClipboardList, label: "Informações" },
-    { Icon: Users, label: "Convidados" },
-    { Icon: CheckCircle, label: "Obrigado" },
-  ]
-  const totalSlides = slidesTitles.length
-
-  const goToSlide = (index) => {
-    // Não permitir pular etapas: só voltar ou permanecer na atual
-    if (index >= 0 && index < totalSlides && index <= currentSlide) {
-      setCurrentSlide(index)
-    }
-  }
-
-  const handleNext = () => {
-    if (currentSlide < totalSlides - 1) {
-      setCurrentSlide(currentSlide + 1)
-    }
-  }
-
-  const handlePrev = () => {
-    if (currentSlide > 0) {
-      setCurrentSlide(currentSlide - 1)
-    }
-  }
-
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX
-  }
-
-  const handleTouchMove = (e) => {
-    touchEndX.current = e.touches[0].clientX
-  }
-
-  const handleTouchEnd = () => {
-    const swipeThreshold = 75
-    const diff = touchStartX.current - touchEndX.current
-
-    if (Math.abs(diff) > swipeThreshold) {
-      if (diff > 0) {
-        handleNext()
-      } else {
-        handlePrev()
-      }
-    }
-  }
-
-  const handleShare = async () => {
-    try {
-      if (navigator?.share) {
-        await navigator.share({
-          title: "Aniversário da Sarah Lorraine",
-          text: "Você está convidado! 28 de Fevereiro às 13h no Buffet Jokempô.",
-          url: typeof window !== "undefined" ? window.location.href : undefined,
-        })
-      }
-    } catch (e) {
-      // Ignorar cancelamentos/erros silenciosamente
-    }
-  }
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "ArrowLeft") {
-        handlePrev()
-      } else if (e.key === "ArrowRight") {
-        handleNext()
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [currentSlide])
-
-  useEffect(() => {
-    if (showPreloader) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = "auto"
-    }
-    return () => {
-      document.body.style.overflow = "auto"
-    }
-  }, [showPreloader])
-
-  if (showPreloader) {
-    return <Preloader onComplete={() => setShowPreloader(false)} />
-  }
-
-  return (
-    <div
-      className="min-h-dvh relative overflow-x-hidden"
-      style={{ touchAction: "pan-y" }}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FFF7F6] via-[#FDF2F0] to-[#EFE4E2] z-0" />
-      <NoiseTexture />
-
-      <EventHeader onShare={handleShare} />
-
-      
-
-      <main className="flex-1 relative z-10 overflow-hidden pb-28 sm:pb-32 pt-20 sm:pt-24">
-        <div className="transition-opacity duration-300 animate-fade-in">
-          {currentSlide === 0 && <ConviteSlide />}
-          {currentSlide === 1 && <InstructionsSlide />}
-          {currentSlide === 2 && (
-            <GroupSlide
-              grupo={grupo}
-              statuses={groupStatuses}
-              onChangeStatus={(i, value) =>
-                setGroupStatuses((prev) => {
-                  const next = [...prev]
-                  next[i] = value
-                  return next
-                })
-              }
-            />
-          )}
-          {currentSlide === 3 && <ThankYouSlide statuses={groupStatuses} />}
-        </div>
-      </main>
-
-
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-[#F7F1EF] via-[#F7F1EF] to-transparent pt-4 pb-6 pb-safe px-4">
-        <div className="max-w-2xl md:max-w-3xl mx-auto">
-          <div className="flex justify-center gap-2 mb-4">
-            {slidesTitles.map((_, index) => (
-              <button
-                key={index}
-                // Desabilita cliques em passos futuros para não pular etapas
-                disabled={index > currentSlide}
-                aria-disabled={index > currentSlide}
-                onClick={index > currentSlide ? undefined : () => goToSlide(index)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${index === currentSlide ? "w-12 bg-[#7B3B3B]" : "w-8 bg-[#D59B83]/30"} ${index > currentSlide ? "opacity-50 cursor-not-allowed" : "hover:bg-[#D59B83]/50"}`}
-                aria-label={`Ir para ${slidesTitles[index].label}`}
-              />
-            ))}
-          </div>
-
-          <div className="bg-white/90 backdrop-blur-md border-2 border-white/60 shadow-2xl shadow-[#7B3B3B]/20 rounded-full p-2 flex items-center gap-2 justify-between">
-            <button
-              onClick={handlePrev}
-              disabled={currentSlide === 0}
-              className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all ${currentSlide === 0
-                ? "bg-[#E9B7BD]/20 text-[#8B6B6B]/30 cursor-not-allowed"
-                : "bg-gradient-to-br from-[#E9B7BD] to-[#D59B83] text-white hover:scale-105 hover:shadow-lg active:scale-95"
-                }`}
-              aria-label="Slide anterior"
-            >
-              <ChevronLeft className="w-6 h-6" strokeWidth={2.5} />
-            </button>
-
-            <div className="flex-1 flex items-center justify-center gap-3 px-2">
-              {slidesTitles.map((slide, index) => {
-                const isActive = currentSlide === index
-                const isDisabled = index > currentSlide
-                return (
-                  <button
-                    key={index}
-                    // Não permite pular etapas clicando diretamente em passos futuros
-                    disabled={isDisabled}
-                    aria-disabled={isDisabled}
-                    onClick={isDisabled ? undefined : () => goToSlide(index)}
-                    aria-current={isActive ? "step" : undefined}
-                    title={`${slide.label}`}
-                    className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full transition-all ${isActive
-                      ? "bg-gradient-to-r from-[#7B3B3B] to-[#5A2D2D] text-white shadow-md scale-105"
-                      : "bg-transparent text-[#8B6B6B]"} ${isDisabled ? "opacity-50 cursor-not-allowed" : "hover:bg-[#F5D1A3]/20"}`}
-                  >
-                    <slide.Icon className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2} />
-                    <span className="hidden sm:inline text-sm font-bold">{slide.label}</span>
-                  </button>
-                )
-              })}
-            </div>
-
-            <button
-              onClick={handleNext}
-              disabled={currentSlide === totalSlides - 1}
-              className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all ${currentSlide === totalSlides - 1
-                ? "bg-[#E9B7BD]/20 text-[#8B6B6B]/30 cursor-not-allowed"
-                : "bg-gradient-to-br from-[#D59B83] to-[#E9B7BD] text-white hover:scale-105 hover:shadow-lg active:scale-95"
-                }`}
-              aria-label="Próximo slide"
-            >
-              <ChevronRight className="w-6 h-6" strokeWidth={2.5} />
-            </button>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   )
 }

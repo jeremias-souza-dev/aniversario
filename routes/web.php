@@ -5,34 +5,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/{telefone?}', function ($telefone = null) {
-
-    return Inertia::render('Welcome', [
-        'grupo' => [
-            'name' => 'Jeremias',
-            'telefone' => $telefone ?? null,
-            'convidados' => [
-                [
-                    'name' => 'Jeremias de souza',
-                    'isCrianca' => null,
-                ],
-                [
-                    'name' => 'Talita de souza',
-                    'isCrianca' => [
-                        'age' => 5,
-                    ],
-                ],
-                [
-                    'name' => 'Sarah Lorrane',
-                    'isCrianca' => [
-                        'age' => 2,
-                    ],
-                ],
-            ],
-        ],
-    ]);
-})->where('telefone', '^\d{10,15}$')->name('welcome');
-
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -42,5 +14,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
+use App\Http\Controllers\GiftController;
+
+Route::get('/presentes', [GiftController::class, 'index'])->name('gifts.index');
+Route::post('/presentes/reservar', [GiftController::class, 'reserve'])->name('gifts.reserve');
 
 require __DIR__ . '/auth.php';
