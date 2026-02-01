@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Gift, Star, Heart, Check, Sparkles, PartyPopper, ExternalLink, Loader2, ImageOff, ArrowUp, ShoppingBag, Plus, Minus, X, Package, Truck } from "lucide-react";
 import Swal from 'sweetalert2';
+import confetti from 'canvas-confetti';
 
 const categorias = ["Todos", "Brinquedos", "Educativos", "Arte", "Fantasias", "Pelúcias", "Roupas"];
 
@@ -57,9 +58,40 @@ export default function ListaPresentes({ gifts, auth }) {
     setImagemErro(prev => ({ ...prev, [id]: true }));
   };
 
+
+
   const adicionarAoCarrinho = (presente) => {
     if (presente.reservado || carrinho.find(p => p.id === presente.id)) return;
     setCarrinho(prev => [...prev, presente]);
+
+    // Celebration Effect
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#ec4899', '#f43f5e', '#fbbf24', '#14b8a6']
+    });
+
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+
+    const qtd = carrinho.length + 1;
+    Toast.fire({
+      icon: 'success',
+      title: 'Adicionado!',
+      text: `A Sarah ficará muito feliz com ${qtd} ${qtd > 1 ? 'presentes' : 'presente'} de ${nomeConvidado || 'você'}! 🎈`,
+      color: '#db2777',
+      background: '#fff1f2'
+    });
   };
 
   const removerDoCarrinho = (id) => {

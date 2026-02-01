@@ -23,6 +23,7 @@
     },
     "dependencies": {
         "@material-tailwind/react": "^2.1.10",
+        "canvas-confetti": "^1.9.4",
         "lucide-react": "^0.562.0",
         "sweetalert2": "^11.26.17"
     }
