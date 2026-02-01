@@ -39,37 +39,61 @@ class GiftController extends Controller
     public function reserve(Request $request)
     {
         $request->validate([
-            'id' => 'required|integer',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:gifts,id',
             'nome' => 'required|string|max:255',
         ]);
 
-        $gift = Gift::find($request->id);
+        $conflictIds = [];
+        $reservedGifts = [];
 
-        if ($gift && !$gift->reservado) {
-            $gift->update([
-                'reservado' => true,
-                'reservado_por' => $request->nome,
-            ]);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, &$conflictIds, &$reservedGifts) {
+            // Lock records for update to prevent race conditions within the transaction check
+            // However, simple check then update is often enough for this scale if we check state
+
+            $giftsToCheck = Gift::whereIn('id', $request->ids)->lockForUpdate()->get();
+
+            foreach ($giftsToCheck as $gift) {
+                if ($gift->reservado) {
+                    $conflictIds[] = $gift->id;
+                }
+            }
+
+            if (empty($conflictIds)) {
+                foreach ($giftsToCheck as $gift) {
+                    $gift->update([
+                        'reservado' => true,
+                        'reservado_por' => $request->nome,
+                    ]);
+                    $reservedGifts[] = $gift;
+                }
+            }
+        });
+
+        if (!empty($conflictIds)) {
+            return response()->json([
+                'message' => 'Alguns presentes já foram reservados por outra pessoa.',
+                'conflicts' => $conflictIds
+            ], 409);
         }
 
         if ((request()->ajax() || request()->wantsJson()) && !request()->inertia()) {
-            // Return updated list or just success? Old code returned full list.
-            $gifts = Gift::all();
-            $presentes = $gifts->map(function ($g) {
-                return [
-                    'id' => $g->id,
-                    'nome' => $g->nome,
-                    'descricao' => $g->descricao ?? '',
-                    'categoria' => $g->categoria,
-                    'preco' => $g->preco ?? null,
-                    'link' => $g->link,
-                    'reservado' => (bool) $g->reservado,
-                    'reservadoPor' => $g->reservado_por ?? '',
-                    'imagem' => $g->imagem,
-                ];
-            });
-
-            return response()->json(['presentes' => $presentes]);
+            return response()->json([
+                'message' => 'Reserva realizada com sucesso!',
+                'presentes' => Gift::all()->map(function ($g) {
+                    return [
+                        'id' => $g->id,
+                        'nome' => $g->nome,
+                        'descricao' => $g->descricao ?? '',
+                        'categoria' => $g->categoria,
+                        'preco' => $g->preco ?? null,
+                        'link' => $g->link,
+                        'reservado' => (bool) $g->reservado,
+                        'reservadoPor' => $g->reservado_por ?? '',
+                        'imagem' => $g->imagem,
+                    ];
+                })
+            ]);
         }
 
         return redirect()->back();

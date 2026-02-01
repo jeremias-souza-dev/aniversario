@@ -26,6 +26,7 @@ export default function ListaPresentes({ gifts, auth }) {
   const [filtro, setFiltro] = useState("Todos");
   const [carrinhoAberto, setCarrinhoAberto] = useState(false);
   const [carrinho, setCarrinho] = useState([]);
+  const [conflitos, setConflitos] = useState([]);
 
   const defaultName = auth?.user?.user_relationship?.real_name || auth?.user?.name || "";
   const [nomeConvidado, setNomeConvidado] = useState(defaultName);
@@ -62,6 +63,12 @@ export default function ListaPresentes({ gifts, auth }) {
 
   const adicionarAoCarrinho = (presente) => {
     if (presente.reservado || carrinho.find(p => p.id === presente.id)) return;
+
+    // Clear conflict if the item is handled
+    if (conflitos.includes(presente.id)) {
+      setConflitos(prev => prev.filter(id => id !== presente.id));
+    }
+
     setCarrinho(prev => [...prev, presente]);
 
     // Celebration Effect
@@ -318,9 +325,11 @@ export default function ListaPresentes({ gifts, auth }) {
                   key={presente.id}
                   className={`group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 ${presente.reservado
                     ? "opacity-60 grayscale"
-                    : noCarrinho
-                      ? "ring-2 ring-amber-400 shadow-lg shadow-amber-100"
-                      : "hover:shadow-xl hover:-translate-y-1"
+                    : conflitos.includes(presente.id)
+                      ? "ring-4 ring-red-500 shadow-xl shadow-red-100" // Red border for conflicts
+                      : noCarrinho
+                        ? "ring-2 ring-amber-400 shadow-lg shadow-amber-100"
+                        : "hover:shadow-xl hover:-translate-y-1"
                     }`}
                 >
                   {/* Badge de Status */}
@@ -329,7 +338,12 @@ export default function ListaPresentes({ gifts, auth }) {
                       <Check className="w-3 h-3" /> Reservado
                     </div>
                   )}
-                  {noCarrinho && !presente.reservado && (
+                  {conflitos.includes(presente.id) && !presente.reservado && (
+                    <div className="absolute top-2 right-2 z-10 bg-red-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 font-bold animate-pulse">
+                      <X className="w-3 h-3" /> Indisponível
+                    </div>
+                  )}
+                  {noCarrinho && !presente.reservado && !conflitos.includes(presente.id) && (
                     <div className="absolute top-2 right-2 z-10 bg-amber-400 text-amber-900 text-xs px-2 py-1 rounded-full flex items-center gap-1 font-semibold">
                       <ShoppingBag className="w-3 h-3" /> No Carrinho
                     </div>
