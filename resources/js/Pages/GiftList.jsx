@@ -19,13 +19,17 @@ const iconesCategorias = {
   Brinquedos: "🎀", Educativos: "📚", Arte: "🎨", Fantasias: "👑", Pelúcias: "🧸", Roupas: "👗",
 };
 
-export default function ListaPresentes({ gifts }) {
+export default function ListaPresentes({ gifts, auth }) {
   const [presentes, setPresentes] = useState(gifts || []);
   const [loading, setLoading] = useState(!gifts);
   const [filtro, setFiltro] = useState("Todos");
   const [dialogAberto, setDialogAberto] = useState(false);
   const [presenteSelecionado, setPresenteSelecionado] = useState(null);
-  const [nomeConvidado, setNomeConvidado] = useState("");
+
+  // Use real_name from auth as default, fallback to google name, then empty
+  const defaultName = auth?.user?.user_relationship?.real_name || auth?.user?.name || "";
+  const [nomeConvidado, setNomeConvidado] = useState(defaultName);
+
   const [processando, setProcessando] = useState(false);
   const [imagemErro, setImagemErro] = useState({});
   const [telaConfirmacao, setTelaConfirmacao] = useState(false);
@@ -119,7 +123,8 @@ export default function ListaPresentes({ gifts }) {
       });
 
       setDialogAberto(false);
-      setNomeConvidado('');
+      // Keep name for next reservation if they want
+      // setNomeConvidado(''); 
       setPresenteSelecionado(null);
       setTelaConfirmacao(true);
 
@@ -205,6 +210,30 @@ export default function ListaPresentes({ gifts }) {
 
       {/* Filtros */}
       <div className="max-w-5xl mx-auto px-4 py-8">
+
+        {auth?.user?.user_relationship?.real_name && (
+          <div className="flex flex-col items-center justify-center mb-8 animate-fade-in">
+            <div className="relative mb-2">
+              {auth.user.avatar ? (
+                <img
+                  src={auth.user.avatar}
+                  alt={auth.user.name}
+                  className="w-16 h-16 rounded-full border-4 border-white shadow-md object-cover"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full border-4 border-white shadow-md bg-pink-100 flex items-center justify-center text-2xl">
+                  🎁
+                </div>
+              )}
+              <div className="absolute -bottom-1 -right-1 bg-green-400 w-5 h-5 rounded-full border-2 border-white"></div>
+            </div>
+            <p className="text-xl font-medium text-pink-700">
+              Olá, <span className="font-bold">{auth.user.user_relationship.real_name}</span>!
+            </p>
+            <p className="text-sm text-pink-500/80">Que bom ter você aqui</p>
+          </div>
+        )}
+
         <div className="flex flex-wrap gap-3 justify-center">
           {categorias.map(cat => (
             <button

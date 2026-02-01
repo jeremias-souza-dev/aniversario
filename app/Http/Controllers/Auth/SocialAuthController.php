@@ -30,12 +30,20 @@ class SocialAuthController extends Controller
             return redirect()->route('login')->with('error', 'Unable to login using ' . $provider . '. Please try again.');
         }
 
+        $avatarUrl = $socialUser->getAvatar();
+        $avatarPath = 'avatars/' . $socialUser->getId() . '.jpg';
+
+        if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($avatarPath)) {
+            $contents = file_get_contents($avatarUrl);
+            \Illuminate\Support\Facades\Storage::disk('public')->put($avatarPath, $contents);
+        }
+
         $user = User::updateOrCreate([
             'email' => $socialUser->getEmail(),
         ], [
             'name' => $socialUser->getName(),
             'google_id' => $socialUser->getId(),
-            'avatar' => $socialUser->getAvatar(),
+            'avatar' => \Illuminate\Support\Facades\Storage::url($avatarPath),
             'password' => $user->password ?? null, // Keep existing password if any
             'email_verified_at' => now(), // Auto-verify email from Google
         ]);

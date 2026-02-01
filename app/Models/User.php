@@ -21,7 +21,14 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'google_id',
+        'avatar',
     ];
+
+    public function userRelationship()
+    {
+        return $this->hasOne(UserRelationship::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

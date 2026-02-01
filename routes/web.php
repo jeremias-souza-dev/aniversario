@@ -17,7 +17,19 @@ Route::middleware('auth')->group(function () {
 require __DIR__ . '/auth.php';
 
 Route::middleware('auth')->group(function () {
-    Route::get('/', [GiftController::class, 'index'])->name('gifts.index');
-    Route::get('/presentes', [GiftController::class, 'index'])->name('gifts.index');
-    Route::post('/presentes/reservar', [GiftController::class, 'reserve'])->name('gifts.reserve');
+    Route::get('/completar-cadastro', [App\Http\Controllers\GuestInfoController::class, 'create'])->name('guest.info.create');
+    Route::post('/completar-cadastro', [App\Http\Controllers\GuestInfoController::class, 'store'])->name('guest.info.store');
+
+    Route::middleware([\App\Http\Middleware\EnsureGuestInfoCompleted::class])->group(function () {
+        Route::get('/', [GiftController::class, 'index'])->name('gifts.index');
+        Route::get('/presentes', [GiftController::class, 'index'])->name('gifts.index');
+        Route::post('/presentes/reservar', [GiftController::class, 'reserve'])->name('gifts.reserve');
+    });
+});
+
+
+//
+Route::get('/logout-test', function () {
+    auth()->logout();
+    return redirect('/');
 });

@@ -13,7 +13,7 @@ class GiftController extends Controller
         $gifts = Gift::all();
 
         // Se for requisição AJAX/Fetch, retorne JSON no formato esperado pelo frontend
-        if (request()->ajax() || request()->wantsJson()) {
+        if ((request()->ajax() || request()->wantsJson()) && !request()->inertia()) {
             $presentes = $gifts->map(function ($g) {
                 return [
                     'id' => $g->id,
@@ -52,7 +52,7 @@ class GiftController extends Controller
             ]);
         }
 
-        if ($request->ajax() || $request->wantsJson()) {
+        if ((request()->ajax() || request()->wantsJson()) && !request()->inertia()) {
             // Return updated list or just success? Old code returned full list.
             $gifts = Gift::all();
             $presentes = $gifts->map(function ($g) {
