@@ -30,7 +30,7 @@ export default function ListaPresentes({ gifts }) {
   const [imagemErro, setImagemErro] = useState({});
   const [telaConfirmacao, setTelaConfirmacao] = useState(false);
   const [reservaConfirmada, setReservaConfirmada] = useState(null);
-  
+
   // Estado para controlar a visibilidade da seta para cima
   const [mostrarSubir, setMostrarSubir] = useState(false);
 
@@ -185,7 +185,7 @@ export default function ListaPresentes({ gifts }) {
           </div>
 
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-pink-600 via-rose-500 to-pink-600 bg-clip-text text-transparent mb-3 drop-shadow-sm">
-            Sarah Lorrine
+            Sarah Lorraine
           </h1>
 
           <p className="text-xl text-pink-600 font-semibold mb-8">Lista de Presentes</p>
@@ -211,8 +211,8 @@ export default function ListaPresentes({ gifts }) {
               key={cat}
               onClick={() => setFiltro(cat)}
               className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 border-2 ${filtro === cat
-                  ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg border-pink-500 scale-105"
-                  : "bg-white text-pink-600 border-pink-200 hover:bg-pink-50 hover:border-pink-300"
+                ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg border-pink-500 scale-105"
+                : "bg-white text-pink-600 border-pink-200 hover:bg-pink-50 hover:border-pink-300"
                 }`}
             >
               {cat !== "Todos" && <span className="mr-1">{iconesCategorias[cat]}</span>}
@@ -236,8 +236,8 @@ export default function ListaPresentes({ gifts }) {
                 key={presente.id}
                 onClick={() => abrirDialog(presente)}
                 className={`group cursor-pointer transition-all duration-300 rounded-2xl border-2 overflow-hidden ${presente.reservado
-                    ? "opacity-70 bg-gray-50 border-gray-200 cursor-not-allowed"
-                    : "bg-white border-pink-100 hover:border-pink-300 hover:shadow-xl hover:-translate-y-1"
+                  ? "opacity-70 bg-gray-50 border-gray-200 cursor-not-allowed"
+                  : "bg-white border-pink-100 hover:border-pink-300 hover:shadow-xl hover:-translate-y-1"
                   }`}
               >
                 {/* Imagem do Presente */}
@@ -451,7 +451,7 @@ export default function ListaPresentes({ gifts }) {
               </div>
 
               <p className="text-center text-xs text-gray-400 mt-3">
-                A Sarah Lorrine vai adorar!
+                A Sarah Lorraine vai adorar!
               </p>
             </div>
           </div>
@@ -473,7 +473,7 @@ export default function ListaPresentes({ gifts }) {
       <footer className="py-12 text-center text-pink-400 border-t border-pink-100">
         <div className="flex items-center justify-center gap-2 mb-2">
           <Heart className="w-4 h-4 fill-current" />
-          <span>Feito com amor para Sarah Lorrine</span>
+          <span>Feito com amor para Sarah Lorraine</span>
           <Heart className="w-4 h-4 fill-current" />
         </div>
         <p className="text-sm text-pink-300">Aniversário de 3 aninhos</p>

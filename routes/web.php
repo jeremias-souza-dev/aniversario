@@ -13,7 +13,11 @@ Route::middleware('auth')->group(function () {
 
 
 
-Route::get('/{presentes?}', [GiftController::class, 'index'])->name('gifts.index');
-Route::post('/presentes/reservar', [GiftController::class, 'reserve'])->name('gifts.reserve');
 
 require __DIR__ . '/auth.php';
+
+Route::middleware('auth')->group(function () {
+    Route::get('/', [GiftController::class, 'index'])->name('gifts.index');
+    Route::get('/presentes', [GiftController::class, 'index'])->name('gifts.index');
+    Route::post('/presentes/reservar', [GiftController::class, 'reserve'])->name('gifts.reserve');
+});
