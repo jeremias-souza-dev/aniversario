@@ -98,7 +98,7 @@ export default function ListaPresentes({ gifts, auth }) {
               const updatedItem = data.presentes.find(p => p.id === item.id);
               if (updatedItem && updatedItem.reservado) {
                 // If user is the one who reserved it locally just now (not robust without user ID check, 
-                // but assuming 'reservadoPor' matches current user might be tricky if names are not unique. 
+                // but assuming 'reservado_por' matches current user might be tricky if names are not unique. 
                 // Actually, if it's reserved on server but I haven't confirmed my reservation yet (it's in cart), 
                 // then it IS a conflict, regardless of who reserved it (likely someone else).
                 // UNLESS I just reserved it? But if I just reserved it, my cart would be empty.
@@ -174,7 +174,7 @@ export default function ListaPresentes({ gifts, auth }) {
     // If we remove a conflicting item, we know it's already reserved on server, so update local state
     if (conflitos.includes(id)) {
       setPresentes(prev => prev.map(p =>
-        p.id === id ? { ...p, reservado: true, reservadoPor: 'Outra pessoa' } : p
+        p.id === id ? { ...p, reservado: true, reservado_por: 'Outra pessoa' } : p
       ));
       setConflitos(prev => prev.filter(cId => cId !== id));
     }
@@ -473,7 +473,7 @@ export default function ListaPresentes({ gifts, auth }) {
 
                     {presente.reservado ? (
                       <p className="text-[10px] text-gray-400 flex items-center gap-1 mt-2">
-                        <Heart className="w-3 h-3 fill-current" /> por {presente.reservadoPor}
+                        <Heart className="w-3 h-3 fill-current" /> por {presente.reservado_por}
                       </p>
                     ) : (
                       <>
@@ -733,7 +733,7 @@ export default function ListaPresentes({ gifts, auth }) {
                 <Check className="w-8 h-8 text-green-500" />
               </div>
               <h2 className="text-2xl font-bold text-white">Reservas Confirmadas!</h2>
-              <p className="text-green-100 text-sm mt-1">Obrigada, {reservasConfirmadas[0]?.reservadoPor}!</p>
+              <p className="text-green-100 text-sm mt-1">Obrigada, {reservasConfirmadas[0]?.reservado_por}!</p>
             </div>
 
             {/* Lista de Reservas */}

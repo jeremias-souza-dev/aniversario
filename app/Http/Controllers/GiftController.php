@@ -64,6 +64,7 @@ class GiftController extends Controller
                     $gift->update([
                         'reservado' => true,
                         'reservado_por' => $request->nome,
+                        'user_id' => \Illuminate\Support\Facades\Auth::id(),
                     ]);
                     $reservedGifts[] = $gift;
                 }
