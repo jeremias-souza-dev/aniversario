@@ -25,7 +25,21 @@ export default function ListaPresentes({ gifts, auth }) {
   const [loading, setLoading] = useState(!gifts);
   const [filtro, setFiltro] = useState("Todos");
   const [carrinhoAberto, setCarrinhoAberto] = useState(false);
-  const [carrinho, setCarrinho] = useState([]);
+  const [carrinho, setCarrinho] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('carrinho-aniversario');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+  // Track IDs of confirmed reservations by this user
+  const [meusReservados, setMeusReservados] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('reservados-aniversario');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
   const [conflitos, setConflitos] = useState([]);
 
   const defaultName = auth?.user?.user_relationship?.real_name || auth?.user?.name || "";
@@ -50,6 +64,61 @@ export default function ListaPresentes({ gifts, auth }) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [gifts]);
+
+  // Persist cart
+  useEffect(() => {
+    localStorage.setItem('carrinho-aniversario', JSON.stringify(carrinho));
+  }, [carrinho]);
+
+  // Auto-refresh data every 60 seconds
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : "";
+
+        // Using a simple fetch with headers to trigger the JSON response in GiftController
+        const res = await fetch(window.location.href, {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+            'X-Inertia-Partial-Component': 'GiftList', // Requesting Inertia partial just in case
+            'X-CSRF-TOKEN': csrfToken
+          }
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.presentes) {
+            setPresentes(data.presentes);
+
+            // Check for conflicts with current cart
+            const newConflicts = [];
+            carrinho.forEach(item => {
+              const updatedItem = data.presentes.find(p => p.id === item.id);
+              if (updatedItem && updatedItem.reservado) {
+                // If user is the one who reserved it locally just now (not robust without user ID check, 
+                // but assuming 'reservadoPor' matches current user might be tricky if names are not unique. 
+                // Actually, if it's reserved on server but I haven't confirmed my reservation yet (it's in cart), 
+                // then it IS a conflict, regardless of who reserved it (likely someone else).
+                // UNLESS I just reserved it? But if I just reserved it, my cart would be empty.
+                // So if it's in my cart and reserved on server, it MUST be a conflict.
+                newConflicts.push(item.id);
+              }
+            });
+
+            if (newConflicts.length > 0) {
+              setConflitos(prev => [...new Set([...prev, ...newConflicts])]);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar lista:", error);
+      }
+    }, 60000); // 1 minute
+
+    return () => clearInterval(interval);
+  }, [carrinho]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -102,6 +171,13 @@ export default function ListaPresentes({ gifts, auth }) {
   };
 
   const removerDoCarrinho = (id) => {
+    // If we remove a conflicting item, we know it's already reserved on server, so update local state
+    if (conflitos.includes(id)) {
+      setPresentes(prev => prev.map(p =>
+        p.id === id ? { ...p, reservado: true, reservadoPor: 'Outra pessoa' } : p
+      ));
+      setConflitos(prev => prev.filter(cId => cId !== id));
+    }
     setCarrinho(prev => prev.filter(p => p.id !== id));
   };
 
@@ -123,51 +199,62 @@ export default function ListaPresentes({ gifts, auth }) {
     if (!result.isConfirmed) return;
 
     setProcessando(true);
+    setConflitos([]); // Clear previous conflicts
 
     const csrfMeta = document.querySelector('meta[name="csrf-token"]');
     const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : "";
 
     try {
-      const reservasRealizadas = [];
+      const res = await fetch('/presentes/reservar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({
+          ids: carrinho.map(p => p.id),
+          nome: nomeConvidado
+        }),
+      });
 
-      for (const presente of carrinho) {
-        const res = await fetch('/presentes/reservar', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': csrfToken
-          },
-          body: JSON.stringify({
-            id: presente.id,
-            nome: nomeConvidado
-          }),
-        });
+      const data = await res.json().catch(() => ({}));
 
-        if (res.ok) {
-          reservasRealizadas.push(presente);
-          setPresentes(prev => prev.map(p =>
-            p.id === presente.id
-              ? { ...p, reservado: true, reservadoPor: nomeConvidado }
-              : p
-          ));
+      if (!res.ok) {
+        if (res.status === 409 && data.conflicts) {
+          setConflitos(data.conflicts);
+
+          // Identify which gifts are conflicting for the message
+          const conflictingNames = carrinho
+            .filter(p => data.conflicts.includes(p.id))
+            .map(p => p.nome)
+            .join(', ');
+
+          throw new Error(`Alguns presentes já foram reservados por outra pessoa: ${conflictingNames}. Remova-os do carrinho para continuar.`);
         }
+        throw new Error(data.message || 'Erro ao processar reserva.');
       }
 
-      if (reservasRealizadas.length > 0) {
-        setReservasConfirmadas(reservasRealizadas.map(p => ({
-          ...p,
-          reservadoPor: nomeConvidado
-        })));
-        setCarrinho([]);
-        setCarrinhoAberto(false);
-        setTelaConfirmacao(true);
-      } else {
-        throw new Error('Nenhuma reserva foi realizada.');
-      }
+      // Success
+      setPresentes(data.presentes); // Update full list from server
+
+      const novosIdsReservados = carrinho.map(p => p.id);
+      const atualizadosbr = [...meusReservados, ...novosIdsReservados];
+      setMeusReservados(atualizadosbr);
+      localStorage.setItem('reservados-aniversario', JSON.stringify(atualizadosbr));
+
+      setCarrinho([]);
+      setCarrinhoAberto(false);
+      setTelaConfirmacao(true);
 
     } catch (err) {
-      Swal.fire('Ops!', err.message, 'error');
+      Swal.fire({
+        title: 'Atenção!',
+        text: err.message,
+        icon: 'warning',
+        confirmButtonColor: '#fbbf24',
+        confirmButtonText: 'Entendi'
+      });
     } finally {
       setProcessando(false);
     }
@@ -255,12 +342,15 @@ export default function ListaPresentes({ gifts, auth }) {
               </div>
               <p className="text-xs text-gray-500 font-medium">Reservados</p>
             </div>
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-5 py-3 shadow-lg border-2 border-amber-200">
-              <div className="flex items-center gap-2">
-                <ShoppingBag className="w-5 h-5 text-amber-500" />
-                <span className="text-2xl font-bold text-amber-500">{carrinho.length}</span>
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border-2 border-amber-300 flex flex-col items-center justify-center transform hover:scale-105 transition-transform duration-300 relative">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                Sua lista
               </div>
-              <p className="text-xs text-gray-500 font-medium">No Carrinho</p>
+              <div className="flex items-center gap-2 mb-1">
+                <ShoppingBag className="w-5 h-5 text-amber-500" />
+                <span className="text-2xl font-bold text-amber-600 leading-none">{carrinho.length + meusReservados.length}</span>
+              </div>
+              <span className="text-xs font-semibold text-amber-900/70 uppercase tracking-wide">Minhas Reservas</span>
             </div>
           </div>
         </div>
@@ -399,7 +489,10 @@ export default function ListaPresentes({ gifts, auth }) {
                             <>
                               <button
                                 onClick={() => removerDoCarrinho(presente.id)}
-                                className="flex-1 py-2 px-3 rounded-xl font-semibold text-amber-700 bg-amber-100 hover:bg-amber-200 transition-all duration-200 flex items-center justify-center gap-1.5 text-xs border border-amber-300"
+                                className={`flex-1 py-2 px-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 text-xs border ${conflitos.includes(presente.id)
+                                  ? "text-red-700 bg-red-100 hover:bg-red-200 border-red-300"
+                                  : "text-amber-700 bg-amber-100 hover:bg-amber-200 border-amber-300"
+                                  }`}
                               >
                                 <Minus className="w-3.5 h-3.5" />
                                 Remover
@@ -457,7 +550,7 @@ export default function ListaPresentes({ gifts, auth }) {
                 <div className="flex items-center gap-3">
                   <ShoppingBag className="w-6 h-6" />
                   <div>
-                    <h2 className="text-lg font-bold">Carrinho de Reservas</h2>
+                    <h2 className="text-lg font-bold">Reservas</h2>
                     <p className="text-pink-100 text-sm">{carrinho.length} item(s) selecionado(s)</p>
                   </div>
                 </div>
@@ -472,7 +565,7 @@ export default function ListaPresentes({ gifts, auth }) {
 
             {/* Lista de Itens */}
             <div className="flex-1 overflow-y-auto p-4">
-              {carrinho.length === 0 ? (
+              {carrinho.length === 0 && meusReservados.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
                   <ShoppingBag className="w-16 h-16 mb-4 opacity-30" />
                   <p className="font-medium">Seu carrinho está vazio</p>
@@ -480,11 +573,12 @@ export default function ListaPresentes({ gifts, auth }) {
                 </div>
               ) : (
                 <div className="space-y-3">
+                  {/* Itens Pendentes (Carrinho) */}
                   {carrinho.map(item => (
-                    <div key={item.id} className="flex gap-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-pink-100 flex-shrink-0">
+                    <div key={'cart-' + item.id} className={`flex gap-3 bg-gray-50 rounded-xl p-3 border transition-all ${conflitos.includes(item.id) ? "border-red-500 ring-1 ring-red-200 bg-red-50" : "border-gray-100"}`}>
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-pink-100 flex-shrink-0 relative">
                         {item.imagem && !imagemErro[item.id] ? (
-                          <img src={item.imagem || "/placeholder.svg"} alt={item.nome} className="w-full h-full object-cover" />
+                          <img src={item.imagem || "/placeholder.svg"} alt={item.nome} className={`w-full h-full object-cover ${conflitos.includes(item.id) ? "grayscale opacity-70" : ""}`} />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <Gift className="w-6 h-6 text-pink-300" />
@@ -492,20 +586,64 @@ export default function ListaPresentes({ gifts, auth }) {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm text-gray-800 line-clamp-2">{item.nome}</h4>
-                        <p className="text-teal-600 font-bold text-sm mt-1">{item.preco}</p>
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium mt-1 ${coresCategorias[item.categoria]}`}>
-                          {iconesCategorias[item.categoria]} {item.categoria}
-                        </span>
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-medium text-sm text-gray-800 line-clamp-2">{item.nome}</h4>
+                          <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Pendente</span>
+                        </div>
+
+                        {conflitos.includes(item.id) ? (
+                          <div className="mt-1 flex items-start gap-1 text-xs font-bold text-red-600 animate-pulse">
+                            <X className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                            <span>Indisponível - Outra pessoa reservou nesse meio tempo</span>
+                          </div>
+                        ) : (
+                          <>
+                            <p className="text-teal-600 font-bold text-sm mt-1">{item.preco}</p>
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium mt-1 ${coresCategorias[item.categoria]}`}>
+                              {iconesCategorias[item.categoria]} {item.categoria}
+                            </span>
+                          </>
+                        )}
                       </div>
                       <button
                         onClick={() => removerDoCarrinho(item.id)}
                         className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start"
+                        title="Remover do carrinho"
                       >
                         <X className="w-4 h-4" />
                       </button>
                     </div>
                   ))}
+
+                  {/* Itens Já Reservados (Histórico Confirmado) */}
+                  {presentes
+                    .filter(p => meusReservados.includes(p.id))
+                    .map(item => (
+                      <div key={'hist-' + item.id} className="flex gap-3 bg-green-50 rounded-xl p-3 border border-green-200 opacity-90">
+                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-pink-100 flex-shrink-0 relative">
+                          {item.imagem && !imagemErro[item.id] ? (
+                            <img src={item.imagem || "/placeholder.svg"} alt={item.nome} className="w-full h-full object-cover grayscale-[30%]" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Gift className="w-6 h-6 text-pink-300" />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center">
+                            <Check className="w-8 h-8 text-white drop-shadow-md" />
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-medium text-sm text-gray-700 line-clamp-2">{item.nome}</h4>
+                            <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Reservado</span>
+                          </div>
+                          <p className="text-gray-500 font-bold text-sm mt-1">{item.preco}</p>
+                          <p className="text-[10px] text-green-600 mt-1 flex items-center gap-1">
+                            <Check className="w-3 h-3" /> Confirmado para você
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                 </div>
               )}
             </div>
