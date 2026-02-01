@@ -344,7 +344,7 @@ class GiftController extends Controller
                 [
                     "id" =>  33,
                     "nome" => "Manta Infantil Solteiro",
-                    "categoria" => "Brinquedos",
+                    "categoria" => "Roupas",
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/manta_infantil.webp'),
@@ -670,16 +670,7 @@ class GiftController extends Controller
 
                 // --- ARTE / MÚSICA / CRIATIVIDADE ---
                 
-                [
-                    "id" => 75,
-                    "nome" => "Cavalete de pintura com tintas laváveis",
-                    "categoria" => "Arte",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/cavalete_pintura.webp'),
-                    "link" => null,
-                ],
-              
+               
                 [
                     "id" => 77,
                     "nome" => "Violão infantil colorido",
@@ -687,31 +678,14 @@ class GiftController extends Controller
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/violao_infantil.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/5AmhO5cXWw',
                 ],
-                [
-                    "id" => 78,
-                    "nome" => "Kit fantoches grandes (histórias)",
-                    "categoria" => "Arte",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/kit_fantoches_grandes.webp'),
-                    "link" => null,
-                ],
+                
                
                
 
                 // --- ROUPAS E ACESSÓRIOS ESTILOSOS ---
                
-                [
-                    "id" => 85,
-                    "nome" => "Jaqueta jeans infantil bordada",
-                    "categoria" => "Roupas",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/jaqueta_jeans_bordada.webp'),
-                    "link" => null,
-                ],
                 [
                     "id" => 86,
                     "nome" => "Conjunto moletom estiloso (inverno)",
@@ -730,24 +704,8 @@ class GiftController extends Controller
                     "imagem" => asset('images/gifts/tenis_casual_feminino.webp'),
                     "link" => 'https://s.shopee.com.br/AABNJLfa2f',
                 ],
-                [
-                    "id" => 88,
-                    "nome" => "Mochila pelúcia bichinho premium",
-                    "categoria" => "Acessórios",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/mochila_pelucia_bichinho.webp'),
-                    "link" => null,
-                ],
-                [
-                    "id" => 89,
-                    "nome" => "Bolsa infantil transversal",
-                    "categoria" => "Acessórios",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/bolsa_infantil_transversal.webp'),
-                    "link" => null,
-                ],
+              
+                
                 [
                     "id" => 90,
                     "nome" => "Kit 5 calcinhas algodão premium",
@@ -755,7 +713,7 @@ class GiftController extends Controller
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/kit_5_calcinhas.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/gKI2gyBed',
                 ],
                 [
                     "id" => 91,
@@ -764,108 +722,49 @@ class GiftController extends Controller
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/conjunto_saia_blusinha.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/7KrByfk0PQ',
                 ],
                 [
                     "id" => 92,
-                    "nome" => "Bota infantil cano curto",
+                    "nome" => "Bota infantil cano curto(Calçado 26)",
                     "categoria" => "Calçados",
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/bota_infantil_cano_curto.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/gKI31lNC5',
                 ],
-                [
-                    "id" => 93,
-                    "nome" => "Casaco cardigan tricô",
-                    "categoria" => "Roupas",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/casaco_cardigan_trico.webp'),
-                    "link" => null,
-                ],
+                
 
                 // --- ATIVOS / DIVERSÃO FÍSICA ---
-                [
-                    "id" => 94,
-                    "nome" => "Kit proteção (capacete + joelheira + cotoveleira)",
-                    "categoria" => "Brinquedos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/kit_protecao_infantil.webp'),
-                    "link" => null,
-                ],
+               
                 [
                     "id" => 95,
-                    "nome" => "Mini cama elástica infantil",
+                    "nome" => "Kit 10 Laços de Cabelo Infantil",
                     "categoria" => "Brinquedos",
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/mini_cama_elastica.webp'),
                     "link" => null,
                 ],
-                [
-                    "id" => 96,
-                    "nome" => "Cavalinho pula-pula inflável (unicórnio)",
-                    "categoria" => "Brinquedos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/cavalinho_pula_pula.webp'),
-                    "link" => null,
-                ],
-                [
-                    "id" => 97,
-                    "nome" => "Bola pula-pula com alça",
-                    "categoria" => "Brinquedos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/bola_pula_pula_alca.webp'),
-                    "link" => null,
-                ],
-                [
-                    "id" => 98,
-                    "nome" => "Patins iniciante 4 rodas",
-                    "categoria" => "Brinquedos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/patins_iniciante_4_rodas.webp'),
-                    "link" => null,
-                ],
-                [
-                    "id" => 99,
-                    "nome" => "Túnel de brincar dobrável",
-                    "categoria" => "Brinquedos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/tunel_brincar_dobravel.webp'),
-                    "link" => null,
-                ],
-                [
-                    "id" => 100,
-                    "nome" => "Kit boliche infantil",
-                    "categoria" => "Brinquedos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/kit_boliche_infantil.webp'),
-                    "link" => null,
-                ],
+                
+               
                 [
                     "id" => 101,
-                    "nome" => "Arco e flecha infantil com ventosa",
-                    "categoria" => "Brinquedos",
+                    "nome" => "Cavalo de Pelúcia ",
+                    "categoria" => "Pelúcias",
                     "reservado" => false,
                     "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/arco_flecha_ventosa.webp'),
-                    "link" => null,
+                    "imagem" => asset('images/gifts/cavalo.webp'),
+                    "link" => 'https://s.shopee.com.br/7AXloHBq3L',
                 ],
                 [
                     "id" => 102,
-                    "nome" => "Jogo de argolas gigante",
+                    "nome" => "Kit 4 Shorts (Tamanho 4)",
                     "categoria" => "Brinquedos",
                     "reservado" => false,
                     "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/jogo_argolas_gigante.webp'),
-                    "link" => null,
+                    "imagem" => asset('images/gifts/shorts.webp'),
+                    "link" => "https://s.shopee.com.br/7fU2QeZAxo",
                 ],
 
             ];
