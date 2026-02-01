@@ -735,8 +735,6 @@ class GiftController extends Controller
                 ],
                 
 
-                // --- ATIVOS / DIVERSÃO FÍSICA ---
-               
                 [
                     "id" => 95,
                     "nome" => "Kit 10 Laços de Cabelo Infantil",

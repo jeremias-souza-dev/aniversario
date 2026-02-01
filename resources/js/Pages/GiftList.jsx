@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Gift, Star, Heart, Check, Sparkles, PartyPopper, ExternalLink, Loader2, ImageOff } from "lucide-react";
+import { Gift, Star, Heart, Check, Sparkles, PartyPopper, ExternalLink, Loader2, ImageOff, ArrowUp } from "lucide-react";
 import Swal from 'sweetalert2';
 
 const categorias = ["Todos", "Brinquedos", "Educativos", "Arte", "Fantasias", "Pelúcias", "Roupas"];
@@ -20,7 +20,6 @@ const iconesCategorias = {
 };
 
 export default function ListaPresentes({ gifts }) {
-  // Inicializa com os gifts vindos do Laravel ou array vazio
   const [presentes, setPresentes] = useState(gifts || []);
   const [loading, setLoading] = useState(!gifts);
   const [filtro, setFiltro] = useState("Todos");
@@ -31,13 +30,36 @@ export default function ListaPresentes({ gifts }) {
   const [imagemErro, setImagemErro] = useState({});
   const [telaConfirmacao, setTelaConfirmacao] = useState(false);
   const [reservaConfirmada, setReservaConfirmada] = useState(null);
+  
+  // Estado para controlar a visibilidade da seta para cima
+  const [mostrarSubir, setMostrarSubir] = useState(false);
 
   useEffect(() => {
     if (gifts) {
       setPresentes(gifts);
       setLoading(false);
     }
+
+    // Listener de scroll para mostrar/esconder a seta
+    const handleScroll = () => {
+      if (window.scrollY > 400) {
+        setMostrarSubir(true);
+      } else {
+        setMostrarSubir(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [gifts]);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleImageError = (id) => {
+    setImagemErro(prev => ({ ...prev, [id]: true }));
+  };
 
   const reservarPresente = async () => {
     if (!nomeConvidado.trim() || !presenteSelecionado || processando) return;
@@ -46,7 +68,6 @@ export default function ListaPresentes({ gifts }) {
     const presentId = presenteSelecionado.id;
     const presentName = presenteSelecionado.nome;
 
-    // 1. Confirmação com SweetAlert2 (Visual Profissional)
     const result = await Swal.fire({
       title: 'Confirmar Reserva?',
       text: `Você está reservando "${presentName}". Deseja continuar?`,
@@ -61,7 +82,6 @@ export default function ListaPresentes({ gifts }) {
 
     setProcessando(true);
 
-    // 2. Lógica de Token CSRF para o Laravel
     const csrfMeta = document.querySelector('meta[name="csrf-token"]');
     const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : "";
 
@@ -84,14 +104,12 @@ export default function ListaPresentes({ gifts }) {
         throw new Error(errorData.message || 'Erro ao processar reserva.');
       }
 
-      // 3. Atualização do Estado Local
       setPresentes(prev => prev.map(p =>
         p.id === presentId
           ? { ...p, reservado: true, reservadoPor: guestName }
           : p
       ));
 
-      // 4. Prepara a Tela de Sucesso do Front
       setReservaConfirmada({
         nome: presentName,
         preco: presenteSelecionado.preco,
@@ -286,7 +304,6 @@ export default function ListaPresentes({ gifts }) {
                         )}
                       </div>
 
-                      {/* Botão Reservar visível */}
                       <button
                         className="w-full py-3 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm"
                       >
@@ -306,7 +323,6 @@ export default function ListaPresentes({ gifts }) {
       {dialogAberto && presenteSelecionado && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden">
-            {/* Imagem no modal */}
             {presenteSelecionado.imagem && !imagemErro[presenteSelecionado.id] && (
               <div className="relative h-48 overflow-hidden">
                 <img
@@ -372,7 +388,6 @@ export default function ListaPresentes({ gifts }) {
       {telaConfirmacao && reservaConfirmada && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl max-w-sm w-full shadow-2xl overflow-hidden">
-            {/* Header Compacto */}
             <div className="bg-gradient-to-r from-green-400 to-teal-400 px-5 py-5 text-center">
               <div className="bg-white rounded-full w-14 h-14 flex items-center justify-center mx-auto mb-3 shadow-lg">
                 <Check className="w-7 h-7 text-green-500" />
@@ -381,9 +396,7 @@ export default function ListaPresentes({ gifts }) {
               <p className="text-green-100 text-sm">Obrigada, {reservaConfirmada.reservadoPor}!</p>
             </div>
 
-            {/* Conteúdo */}
             <div className="p-5">
-              {/* Presente reservado */}
               <div className="flex gap-3 items-center bg-gray-50 rounded-xl p-3 mb-4">
                 {reservaConfirmada.imagem ? (
                   <img
@@ -404,7 +417,6 @@ export default function ListaPresentes({ gifts }) {
                 </div>
               </div>
 
-              {/* Onde comprar */}
               <p className="text-center text-gray-600 text-sm mb-3">
                 Compre em qualquer loja ou na Shopee:
               </p>
@@ -426,7 +438,6 @@ export default function ListaPresentes({ gifts }) {
                   </div>
                 )}
 
-                {/* Botão Reservar Mais */}
                 <button
                   onClick={() => {
                     setTelaConfirmacao(false);
@@ -447,6 +458,17 @@ export default function ListaPresentes({ gifts }) {
         </div>
       )}
 
+      {/* Seta para voltar ao topo */}
+      {mostrarSubir && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 p-4 rounded-full bg-pink-500 text-white shadow-2xl hover:bg-pink-600 transition-all duration-300 hover:scale-110 active:scale-95 z-40 animate-bounce"
+          aria-label="Voltar ao topo"
+        >
+          <ArrowUp className="w-6 h-6" />
+        </button>
+      )}
+
       {/* Footer */}
       <footer className="py-12 text-center text-pink-400 border-t border-pink-100">
         <div className="flex items-center justify-center gap-2 mb-2">
@@ -458,5 +480,4 @@ export default function ListaPresentes({ gifts }) {
       </footer>
     </div>
   );
-
 }
