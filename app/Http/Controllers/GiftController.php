@@ -78,6 +78,17 @@ class GiftController extends Controller
             ], 409);
         }
 
+        // Send email if there are reserved gifts
+        if (!empty($reservedGifts)) {
+            try {
+                \Illuminate\Support\Facades\Mail::to('talitasantoos11031999@gmail.com')
+                    ->send(new \App\Mail\ReservationConfirmed($reservedGifts, $request->nome));
+            } catch (\Exception $e) {
+                
+                \Illuminate\Support\Facades\Log::error('Erro ao enviar email de reserva: ' . $e->getMessage());
+            }
+        }
+
         if ((request()->ajax() || request()->wantsJson()) && !request()->inertia()) {
             return response()->json([
                 'message' => 'Reserva realizada com sucesso!',
