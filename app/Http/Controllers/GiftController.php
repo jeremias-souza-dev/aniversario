@@ -305,16 +305,7 @@ class GiftController extends Controller
                     "imagem" => asset('images/gifts/maleta_pintura.webp'),
                     "link" => "https://s.shopee.com.br/2Vlw1oTtUF",
                 ],
-                [
-                    "id" =>  29,
-                    "nome" => "Brinquedo Ábaco 5 Colunas Madeira Colorido +30 Blocos",
-                    "categoria" => "Educativos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/abaco.webp'),
-                    "link" => "https://s.shopee.com.br/5VPXbT1htX",
-
-                ],
+               
 
                 // --- CATEGORIA: MOVIMENTO E EXTERIOR ---
                 [
@@ -589,12 +580,12 @@ class GiftController extends Controller
                 ],
                 [
                     "id" => 57,
-                    "nome" => "Caixa registradora com som e leitor",
+                    "nome" => "Caixa Registradora Infantil",
                     "categoria" => "Brinquedos",
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/caixa_registradora.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/7AXlfp83g2',
                 ],
                 [
                     "id" => 58,
@@ -603,16 +594,16 @@ class GiftController extends Controller
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/kit_salao_beleza.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/2qOmVvrfVV',
                 ],
                 [
                     "id" => 59,
-                    "nome" => "Carrinho de passeio para boneca tipo “carrinho bebê”",
+                    "nome" => "Play-Doh Sorveteria Hasbro",
                     "categoria" => "Brinquedos",
                     "reservado" => false,
                     "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/carrinho_passeio_boneca.webp'),
-                    "link" => null,
+                    "imagem" => asset('images/gifts/play_doh_sorveteria_hasbro.webp'),
+                    "link" => 'https://s.shopee.com.br/2qOmW70M58',
                 ],
                 [
                     "id" => 60,
@@ -621,55 +612,30 @@ class GiftController extends Controller
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/kit_piquenique_cesta.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/8fMZTNHgQe',
                 ],
                 [
                     "id" => 61,
-                    "nome" => "Kit confeitaria (cupcakes e bolo de brinquedo)",
+                    "nome" => "Carrinho de Sorvete",
                     "categoria" => "Brinquedos",
                     "reservado" => false,
                     "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/kit_confeitaria.webp'),
-                    "link" => null,
+                    "imagem" => asset('images/gifts/carrinho_de_soverte.webp'),
+                    "link" => 'https://s.shopee.com.br/5AmhJaAWDk',
                 ],
-                [
-                    "id" => 62,
-                    "nome" => "Mercadinho com alimentos de madeira",
-                    "categoria" => "Brinquedos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/mercadinho_madeira.webp'),
-                    "link" => null,
-                ],
-                [
-                    "id" => 63,
-                    "nome" => "Maleta veterinária com pet de pelúcia",
-                    "categoria" => "Brinquedos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/maleta_veterinaria.webp'),
-                    "link" => null,
-                ],
+               
 
                 // --- EDUCATIVOS / DESENVOLVIMENTO ---
                 [
                     "id" => 64,
-                    "nome" => "Quebra-cabeça de madeira 30–40 peças",
+                    "nome" => "Jogo Quebra Cabeça Minnie Mickey Mouse Disne",
                     "categoria" => "Educativos",
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/quebra_cabeca_madeira.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/8fMZUYRiw3',
                 ],
-                [
-                    "id" => 65,
-                    "nome" => "Blocos grandes de montar (tipo Duplo)",
-                    "categoria" => "Educativos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/blocos_grandes_montar.webp'),
-                    "link" => null,
-                ],
+               
                 [
                     "id" => 66,
                     "nome" => "Livro sensorial Montessori",
@@ -677,17 +643,9 @@ class GiftController extends Controller
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/livro_sensorial.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/3LL3C3vkYj',
                 ],
-                [
-                    "id" => 67,
-                    "nome" => "Jogo de encaixe geométrico madeira",
-                    "categoria" => "Educativos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/encaixe_geom_madeira.webp'),
-                    "link" => null,
-                ],
+               
                 [
                     "id" => 68,
                     "nome" => "Lousa mágica dupla face (quadro branco + giz)",
@@ -695,17 +653,9 @@ class GiftController extends Controller
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/lousa_magica_dupla.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/1gCpDIygKX',
                 ],
-                [
-                    "id" => 69,
-                    "nome" => "Dominó infantil ilustrado",
-                    "categoria" => "Educativos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/domino_infantil.webp'),
-                    "link" => null,
-                ],
+             
                 [
                     "id" => 70,
                     "nome" => "Jogo de pescar peixinhos magnético",
@@ -713,46 +663,13 @@ class GiftController extends Controller
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/jogo_pescar_peixinhos.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/9KcGINEmEY',
                 ],
-                [
-                    "id" => 71,
-                    "nome" => "Torre empilha-anel gigante",
-                    "categoria" => "Educativos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/torre_empilha_anel.webp'),
-                    "link" => null,
-                ],
-                [
-                    "id" => 72,
-                    "nome" => "Bingo infantil ilustrado",
-                    "categoria" => "Educativos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/bingo_infantil.webp'),
-                    "link" => null,
-                ],
-                [
-                    "id" => 73,
-                    "nome" => "Relógio educativo de madeira (aprender horas)",
-                    "categoria" => "Educativos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/relogio_educativo_madeira.webp'),
-                    "link" => null,
-                ],
+              
+                
 
                 // --- ARTE / MÚSICA / CRIATIVIDADE ---
-                [
-                    "id" => 74,
-                    "nome" => "Mesinha de atividades com cadeira",
-                    "categoria" => "Arte",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/mesinha_atividades.webp'),
-                    "link" => null,
-                ],
+                
                 [
                     "id" => 75,
                     "nome" => "Cavalete de pintura com tintas laváveis",
@@ -762,15 +679,7 @@ class GiftController extends Controller
                     "imagem" => asset('images/gifts/cavalete_pintura.webp'),
                     "link" => null,
                 ],
-                [
-                    "id" => 76,
-                    "nome" => "Microfone karaokê Bluetooth infantil",
-                    "categoria" => "Brinquedos",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/microfone_karaoke.webp'),
-                    "link" => null,
-                ],
+              
                 [
                     "id" => 77,
                     "nome" => "Violão infantil colorido",
@@ -789,62 +698,11 @@ class GiftController extends Controller
                     "imagem" => asset('images/gifts/kit_fantoches_grandes.webp'),
                     "link" => null,
                 ],
-                [
-                    "id" => 79,
-                    "nome" => "Carimbo infantil educativo letras/números",
-                    "categoria" => "Arte",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/carimbo_educativo.webp'),
-                    "link" => null,
-                ],
-                [
-                    "id" => 80,
-                    "nome" => "Kit adesivos 3D decorativos",
-                    "categoria" => "Arte",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/kit_adesivos_3d.webp'),
-                    "link" => null,
-                ],
-                [
-                    "id" => 81,
-                    "nome" => "Massinha premium com extrusora",
-                    "categoria" => "Arte",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/massinha_premium_extrusora.webp'),
-                    "link" => null,
-                ],
-                [
-                    "id" => 82,
-                    "nome" => "Luminária projetor estrelas infantil",
-                    "categoria" => "Arte",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/luminaria_projetor_estrelas.webp'),
-                    "link" => null,
-                ],
-                [
-                    "id" => 83,
-                    "nome" => "Livro de colorir gigante + canetinhas laváveis",
-                    "categoria" => "Arte",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/livro_colorir_gigante.webp'),
-                    "link" => null,
-                ],
+               
+               
 
                 // --- ROUPAS E ACESSÓRIOS ESTILOSOS ---
-                [
-                    "id" => 84,
-                    "nome" => "Vestido festa tule luxo",
-                    "categoria" => "Roupas",
-                    "reservado" => false,
-                    "reservadoPor" => "",
-                    "imagem" => asset('images/gifts/vestido_festa_tule_luxo.webp'),
-                    "link" => null,
-                ],
+               
                 [
                     "id" => 85,
                     "nome" => "Jaqueta jeans infantil bordada",
@@ -861,16 +719,16 @@ class GiftController extends Controller
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/conjunto_moletom_inverno.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/AUoDhPaJEB',
                 ],
                 [
                     "id" => 87,
-                    "nome" => "Tênis casual feminino",
+                    "nome" => "Kit 2 Pares Tênis Infantil (Calçado 25)",
                     "categoria" => "Calçados",
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/tenis_casual_feminino.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/AABNJLfa2f',
                 ],
                 [
                     "id" => 88,
