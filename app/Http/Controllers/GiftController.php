@@ -246,7 +246,8 @@ class GiftController extends Controller
                     "imagem" => asset('images/gifts/penteadeira_infantil.webp'),
                     "link" => "https://s.shopee.com.br/806sYxXGG1",
 
-                ],                [
+                ],
+                [
                     "id" =>  23,
                     "nome" => "Jogo Da Memoria Arca De Noe 56 Cartas",
                     "categoria" => "Educativos",
@@ -348,7 +349,7 @@ class GiftController extends Controller
                     "link" => "https://s.shopee.com.br/AUoDLqZDnj",
 
                 ],
-               
+
                 [
                     "id" =>  33,
                     "nome" => "Manta Infantil Solteiro",
@@ -584,7 +585,7 @@ class GiftController extends Controller
                     "reservado" => false,
                     "reservadoPor" => "",
                     "imagem" => asset('images/gifts/celular_infantil.webp'),
-                    "link" => null,
+                    "link" => 'https://s.shopee.com.br/8AQIr5jBw9',
                 ],
                 [
                     "id" => 57,
