@@ -1,69 +1,67 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Gift, Star, Heart, Check, Sparkles, PartyPopper, ExternalLink, Loader2 } from "lucide-react";
+import { Gift, Star, Heart, Check, Sparkles, PartyPopper, ExternalLink, Loader2, ImageOff } from "lucide-react";
 import Swal from 'sweetalert2';
 
 const categorias = ["Todos", "Brinquedos", "Educativos", "Arte", "Fantasias", "Pelúcias", "Roupas"];
 
 const coresCategorias = {
-  Brinquedos: "bg-pink-100 text-pink-700 border-pink-200",
-  Educativos: "bg-amber-100 text-amber-700 border-amber-200",
-  Arte: "bg-teal-100 text-teal-700 border-teal-200",
-  Fantasias: "bg-purple-100 text-purple-700 border-purple-200",
-  Pelúcias: "bg-rose-100 text-rose-700 border-rose-200",
-  Roupas: "bg-sky-100 text-sky-700 border-sky-200",
+  Brinquedos: "bg-pink-100 text-pink-700 border-pink-300",
+  Educativos: "bg-amber-100 text-amber-700 border-amber-300",
+  Arte: "bg-teal-100 text-teal-700 border-teal-300",
+  Fantasias: "bg-purple-100 text-purple-700 border-purple-300",
+  Pelúcias: "bg-rose-100 text-rose-700 border-rose-300",
+  Roupas: "bg-sky-100 text-sky-700 border-sky-300",
 };
 
 const iconesCategorias = {
-  Brinquedos: "🎀",
-  Educativos: "📚",
-  Arte: "🎨",
-  Fantasias: "👑",
-  Pelúcias: "🧸",
-  Roupas: "👗",
+  Brinquedos: "🎀", Educativos: "📚", Arte: "🎨", Fantasias: "👑", Pelúcias: "🧸", Roupas: "👗",
 };
 
-export default function ListaPresentes(props) {
-  const [presentes, setPresentes] = useState(props.gifts);
-  const [loading, setLoading] = useState(true);
+export default function ListaPresentes({ gifts }) {
+  // Inicializa com os gifts vindos do Laravel ou array vazio
+  const [presentes, setPresentes] = useState(gifts || []);
+  const [loading, setLoading] = useState(!gifts);
   const [filtro, setFiltro] = useState("Todos");
   const [dialogAberto, setDialogAberto] = useState(false);
   const [presenteSelecionado, setPresenteSelecionado] = useState(null);
   const [nomeConvidado, setNomeConvidado] = useState("");
   const [processando, setProcessando] = useState(false);
+  const [imagemErro, setImagemErro] = useState({});
+  const [telaConfirmacao, setTelaConfirmacao] = useState(false);
+  const [reservaConfirmada, setReservaConfirmada] = useState(null);
 
-  // Carrega presentes do backend
   useEffect(() => {
-          setPresentes(props.gifts || []);
-          setLoading(false);
-  }, []);
+    if (gifts) {
+      setPresentes(gifts);
+      setLoading(false);
+    }
+  }, [gifts]);
 
   const reservarPresente = async () => {
     if (!nomeConvidado.trim() || !presenteSelecionado || processando) return;
 
     const guestName = nomeConvidado;
-    const presentName = presenteSelecionado?.nome || '';
+    const presentId = presenteSelecionado.id;
+    const presentName = presenteSelecionado.nome;
 
-    if (presenteSelecionado.reservado) {
-      Swal.fire({ icon: 'warning', title: 'Já reservado', text: 'Este presente já foi reservado por outra pessoa.' });
-      return;
-    }
-
-    const confirmation = await Swal.fire({
-      title: 'Tem certeza?',
-      text: 'Esta ação não poderá ser desfeita. Se outra pessoa já reservou, não será possível reservar novamente.',
-      icon: 'warning',
+    // 1. Confirmação com SweetAlert2 (Visual Profissional)
+    const result = await Swal.fire({
+      title: 'Confirmar Reserva?',
+      text: `Você está reservando "${presentName}". Deseja continuar?`,
+      icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sim, reservar',
+      confirmButtonText: 'Sim, reservar!',
       cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#ec4899',
     });
 
-    if (!confirmation.isConfirmed) return;
+    if (!result.isConfirmed) return;
 
     setProcessando(true);
 
-    // Tenta pegar o token do meta tag ou do cookie XSRF-TOKEN
+    // 2. Lógica de Token CSRF para o Laravel
     const csrfMeta = document.querySelector('meta[name="csrf-token"]');
     const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : "";
 
@@ -75,54 +73,40 @@ export default function ListaPresentes(props) {
           'X-Requested-With': 'XMLHttpRequest',
           'X-CSRF-TOKEN': csrfToken
         },
-        credentials: 'include',
         body: JSON.stringify({
-          id: presenteSelecionado.id,
+          id: presentId,
           nome: guestName
         }),
       });
 
-      if (res.status === 419) {
-        throw new Error('Sessão expirada ou Token CSRF inválido. Recarregue a página.');
-      }
-
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Falha ao reservar o presente');
+        throw new Error(errorData.message || 'Erro ao processar reserva.');
       }
 
-      const data = await res.json();
+      // 3. Atualização do Estado Local
+      setPresentes(prev => prev.map(p =>
+        p.id === presentId
+          ? { ...p, reservado: true, reservadoPor: guestName }
+          : p
+      ));
 
-      // Atualiza a lista com o retorno do servidor ou localmente
-      if (data && data.presentes) {
-        setPresentes(data.presentes);
-      } else {
-        setPresentes(prev => prev.map(p =>
-          p.id === presenteSelecionado.id
-            ? { ...p, reservado: true, reservadoPor: guestName }
-            : p
-        ));
-      }
-
-      // Mostrar feedback de sucesso
-      Swal.fire({
-        icon: 'success',
-        title: 'Reservado',
-        text: `${guestName} reservou: ${presentName}`,
-        timer: 2200,
-        showConfirmButton: false,
+      // 4. Prepara a Tela de Sucesso do Front
+      setReservaConfirmada({
+        nome: presentName,
+        preco: presenteSelecionado.preco,
+        link: presenteSelecionado.link,
+        imagem: presenteSelecionado.imagem,
+        reservadoPor: guestName
       });
 
       setDialogAberto(false);
       setNomeConvidado('');
       setPresenteSelecionado(null);
+      setTelaConfirmacao(true);
+
     } catch (err) {
-      console.error(err);
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro',
-        text: err.message || 'Ocorreu um erro',
-      });
+      Swal.fire('Ops!', err.message, 'error');
     } finally {
       setProcessando(false);
     }
@@ -143,11 +127,34 @@ export default function ListaPresentes(props) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-amber-50">
+      {/* Decorações flutuantes */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-20 left-10 animate-bounce" style={{ animationDelay: '0s' }}>
+          <Sparkles className="w-6 h-6 text-amber-300" />
+        </div>
+        <div className="absolute top-40 right-20 animate-bounce" style={{ animationDelay: '0.5s' }}>
+          <Star className="w-5 h-5 text-pink-300 fill-pink-300" />
+        </div>
+        <div className="absolute top-60 left-20 animate-pulse" style={{ animationDelay: '1s' }}>
+          <Heart className="w-4 h-4 text-rose-300 fill-rose-300" />
+        </div>
+      </div>
+
       {/* Header */}
       <header className="relative overflow-hidden bg-gradient-to-r from-pink-300 via-pink-200 to-amber-200 py-16 px-4">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-4 left-[10%] animate-bounce"><Star className="w-8 h-8 text-amber-400 fill-amber-400" /></div>
-          <div className="absolute top-12 right-[15%] animate-pulse"><Heart className="w-7 h-7 text-pink-500 fill-pink-500" /></div>
+          <div className="absolute top-4 left-[10%] animate-bounce">
+            <Star className="w-8 h-8 text-amber-400 fill-amber-400" />
+          </div>
+          <div className="absolute top-8 right-[20%] animate-pulse">
+            <Heart className="w-7 h-7 text-pink-500 fill-pink-500" />
+          </div>
+          <div className="absolute bottom-6 left-[25%] animate-bounce" style={{ animationDelay: '0.3s' }}>
+            <Sparkles className="w-6 h-6 text-amber-300" />
+          </div>
+          <div className="absolute top-16 right-[10%] animate-pulse" style={{ animationDelay: '0.6s' }}>
+            <Star className="w-5 h-5 text-pink-400 fill-pink-400" />
+          </div>
         </div>
 
         <div className="relative max-w-2xl mx-auto text-center">
@@ -159,18 +166,18 @@ export default function ListaPresentes(props) {
             <PartyPopper className="w-10 h-10 text-pink-600 scale-x-[-1]" />
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-pink-600 via-rose-500 to-pink-600 bg-clip-text text-transparent mb-3">
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-pink-600 via-rose-500 to-pink-600 bg-clip-text text-transparent mb-3 drop-shadow-sm">
             Sarah Lorrine
           </h1>
 
           <p className="text-xl text-pink-600 font-semibold mb-8">Lista de Presentes</p>
 
-          <div className="flex justify-center gap-8">
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg border border-pink-100 w-32">
+          <div className="flex justify-center gap-6">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg border-2 border-pink-100">
               <span className="text-3xl font-bold text-teal-500">{loading ? '...' : disponíveis}</span>
               <p className="text-sm text-gray-500 font-medium">Disponíveis</p>
             </div>
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg border border-pink-100 w-32">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg border-2 border-pink-100">
               <span className="text-3xl font-bold text-pink-500">{loading ? '...' : reservados}</span>
               <p className="text-sm text-gray-500 font-medium">Reservados</p>
             </div>
@@ -185,9 +192,9 @@ export default function ListaPresentes(props) {
             <button
               key={cat}
               onClick={() => setFiltro(cat)}
-              className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all border-2 ${filtro === cat
-                ? "bg-pink-500 text-white shadow-lg border-pink-500"
-                : "bg-white text-pink-600 border-pink-200 hover:bg-pink-50"
+              className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 border-2 ${filtro === cat
+                  ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg border-pink-500 scale-105"
+                  : "bg-white text-pink-600 border-pink-200 hover:bg-pink-50 hover:border-pink-300"
                 }`}
             >
               {cat !== "Todos" && <span className="mr-1">{iconesCategorias[cat]}</span>}
@@ -198,61 +205,96 @@ export default function ListaPresentes(props) {
       </div>
 
       {/* Lista de Presentes */}
-      <main className="max-w-5xl mx-auto px-4 pb-16">
+      <main className="max-w-6xl mx-auto px-4 pb-16">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <Loader2 className="w-10 h-10 text-pink-500 animate-spin" />
             <p className="text-pink-600 font-medium">Carregando surpresas...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {presentesFiltrados.map(presente => (
               <div
                 key={presente.id}
                 onClick={() => abrirDialog(presente)}
-                className={`group cursor-pointer transition-all duration-300 hover:shadow-xl rounded-2xl border-2 overflow-hidden ${presente.reservado
-                  ? "opacity-60 bg-gray-50 border-gray-200"
-                  : "bg-white border-pink-100 hover:border-pink-300"
+                className={`group cursor-pointer transition-all duration-300 rounded-2xl border-2 overflow-hidden ${presente.reservado
+                    ? "opacity-70 bg-gray-50 border-gray-200 cursor-not-allowed"
+                    : "bg-white border-pink-100 hover:border-pink-300 hover:shadow-xl hover:-translate-y-1"
                   }`}
               >
-                <div className="p-5">
-                  <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-xl flex-shrink-0 transition-colors ${presente.reservado ? "bg-gray-200" : "bg-pink-100 group-hover:bg-pink-200"
-                      }`}>
-                      {presente.reservado ? <Check className="w-6 h-6 text-gray-400" /> : <Gift className="w-6 h-6 text-pink-500" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className={`font-semibold text-base leading-tight ${presente.reservado ? "line-through text-gray-400" : "text-gray-800"}`}>
-                        {presente.nome}
-                      </h3>
-                      {presente.reservado && (
-                        <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1">
-                          <Heart className="w-3 h-3 fill-current" /> Reservado por {presente.reservadoPor}
-                        </p>
-                      )}
-                      {presente.preco && !presente.reservado && (
-                        <p className="text-lg font-bold text-teal-600 mt-2">{presente.preco}</p>
+                {/* Imagem do Presente */}
+                <div className={`relative aspect-square overflow-hidden ${presente.reservado ? 'grayscale' : ''}`}>
+                  {presente.imagem && !imagemErro[presente.id] ? (
+                    <img
+                      src={presente.imagem || "/placeholder.svg"}
+                      alt={presente.nome}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      onError={() => handleImageError(presente.id)}
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-pink-100 to-amber-100 flex items-center justify-center">
+                      {imagemErro[presente.id] ? (
+                        <ImageOff className="w-12 h-12 text-pink-300" />
+                      ) : (
+                        <Gift className="w-16 h-16 text-pink-300" />
                       )}
                     </div>
-                  </div>
+                  )}
 
-                  <div className="flex items-center justify-between mt-4">
-                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${coresCategorias[presente.categoria]}`}>
-                      {iconesCategorias[presente.categoria]} {presente.categoria}
-                    </span>
+                  {/* Badge de categoria */}
+                  <span className={`absolute top-3 left-3 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border backdrop-blur-sm bg-white/80 ${coresCategorias[presente.categoria]}`}>
+                    {iconesCategorias[presente.categoria]} {presente.categoria}
+                  </span>
 
-                    {presente.link && !presente.reservado && (
-                      <a
-                        href={presente.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1 text-xs text-pink-500 hover:underline font-medium"
+                  {/* Overlay de reservado */}
+                  {presente.reservado && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <div className="bg-white rounded-full p-3 shadow-lg">
+                        <Check className="w-8 h-8 text-green-500" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info do Presente */}
+                <div className="p-4">
+                  <h3 className={`font-semibold text-base leading-tight mb-2 line-clamp-2 ${presente.reservado ? "line-through text-gray-400" : "text-gray-800"
+                    }`}>
+                    {presente.nome}
+                  </h3>
+
+                  {presente.reservado ? (
+                    <p className="text-xs text-gray-400 flex items-center gap-1">
+                      <Heart className="w-3 h-3 fill-current" /> Reservado por {presente.reservadoPor}
+                    </p>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between mb-3">
+                        {presente.preco && (
+                          <p className="text-lg font-bold text-teal-600">{presente.preco}</p>
+                        )}
+                        {presente.link && (
+                          <a
+                            href={presente.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 text-xs text-pink-500 hover:underline font-medium"
+                          >
+                            Vê Shopee <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
+                      </div>
+
+                      {/* Botão Reservar visível */}
+                      <button
+                        className="w-full py-3 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm"
                       >
-                        Ver link <ExternalLink className="w-3 h-3" />
-                      </a>
-                    )}
-                  </div>
+                        <Gift className="w-4 h-4" />
+                        Reservar Presente
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
@@ -263,18 +305,33 @@ export default function ListaPresentes(props) {
       {/* Modal de Reserva */}
       {dialogAberto && presenteSelecionado && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-pink-100 px-6 py-5 border-b border-pink-200">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden">
+            {/* Imagem no modal */}
+            {presenteSelecionado.imagem && !imagemErro[presenteSelecionado.id] && (
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={presenteSelecionado.imagem || "/placeholder.svg"}
+                  alt={presenteSelecionado.nome}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+              </div>
+            )}
+
+            <div className="bg-gradient-to-r from-pink-100 to-rose-100 px-6 py-5 border-b border-pink-200">
               <h2 className="text-xl font-bold text-pink-700 flex items-center gap-2">
                 <Gift className="w-5 h-5" /> Reservar Presente
               </h2>
             </div>
 
             <div className="p-6">
-              <p className="text-gray-600 mb-4">
-                Você está reservando: <br />
-                <strong className="text-gray-800">{presenteSelecionado.nome}</strong>
+              <p className="text-gray-600 mb-2">
+                Você está reservando:
               </p>
+              <p className="text-lg font-bold text-gray-800 mb-1">{presenteSelecionado.nome}</p>
+              {presenteSelecionado.preco && (
+                <p className="text-teal-600 font-semibold mb-4">{presenteSelecionado.preco}</p>
+              )}
 
               <label className="block text-sm font-medium text-gray-700 mb-2">Seu nome:</label>
               <input
@@ -283,14 +340,17 @@ export default function ListaPresentes(props) {
                 value={nomeConvidado}
                 onChange={e => setNomeConvidado(e.target.value)}
                 disabled={processando}
-                className="w-full rounded-xl border-2 border-pink-100 px-4 py-3 focus:border-pink-400 focus:outline-none transition-all"
+                className="w-full rounded-xl border-2 border-pink-200 px-4 py-3 focus:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all"
                 autoFocus
               />
             </div>
 
             <div className="px-6 pb-6 flex gap-3">
               <button
-                onClick={() => setDialogAberto(false)}
+                onClick={() => {
+                  setDialogAberto(false);
+                  setNomeConvidado('');
+                }}
                 disabled={processando}
                 className="flex-1 rounded-xl border-2 border-gray-200 px-4 py-3 font-semibold text-gray-600 hover:bg-gray-50 transition-all disabled:opacity-50"
               >
@@ -299,7 +359,7 @@ export default function ListaPresentes(props) {
               <button
                 onClick={reservarPresente}
                 disabled={!nomeConvidado.trim() || processando}
-                className="flex-1 rounded-xl px-4 py-3 font-semibold text-white bg-pink-500 hover:bg-pink-600 disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2"
+                className="flex-1 rounded-xl px-4 py-3 font-semibold text-white bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg flex items-center justify-center gap-2"
               >
                 {processando ? <Loader2 className="w-5 h-5 animate-spin" /> : "Confirmar"}
               </button>
@@ -308,11 +368,95 @@ export default function ListaPresentes(props) {
         </div>
       )}
 
-      <footer className="py-12 text-center text-pink-400">
-        <p className="flex items-center justify-center gap-2">
-          <Heart className="w-4 h-4 fill-current" /> Feito para Sarah Lorrine
-        </p>
+      {/* Modal de Confirmação - Após Reserva */}
+      {telaConfirmacao && reservaConfirmada && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl max-w-sm w-full shadow-2xl overflow-hidden">
+            {/* Header Compacto */}
+            <div className="bg-gradient-to-r from-green-400 to-teal-400 px-5 py-5 text-center">
+              <div className="bg-white rounded-full w-14 h-14 flex items-center justify-center mx-auto mb-3 shadow-lg">
+                <Check className="w-7 h-7 text-green-500" />
+              </div>
+              <h2 className="text-xl font-bold text-white">Reserva Confirmada!</h2>
+              <p className="text-green-100 text-sm">Obrigada, {reservaConfirmada.reservadoPor}!</p>
+            </div>
+
+            {/* Conteúdo */}
+            <div className="p-5">
+              {/* Presente reservado */}
+              <div className="flex gap-3 items-center bg-gray-50 rounded-xl p-3 mb-4">
+                {reservaConfirmada.imagem ? (
+                  <img
+                    src={reservaConfirmada.imagem || "/placeholder.svg"}
+                    alt={reservaConfirmada.nome}
+                    className="w-14 h-14 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-lg bg-pink-100 flex items-center justify-center">
+                    <Gift className="w-6 h-6 text-pink-400" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-800 text-sm truncate">{reservaConfirmada.nome}</p>
+                  {reservaConfirmada.preco && (
+                    <p className="text-teal-600 font-bold text-sm">{reservaConfirmada.preco}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Onde comprar */}
+              <p className="text-center text-gray-600 text-sm mb-3">
+                Compre em qualquer loja ou na Shopee:
+              </p>
+
+              <div className="space-y-2">
+                {reservaConfirmada.link ? (
+                  <a
+                    href={reservaConfirmada.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-md transition-all duration-200 flex items-center justify-center gap-2 text-sm"
+                  >
+                    Comprar na Shopee
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                ) : (
+                  <div className="w-full py-3 px-4 rounded-xl text-gray-400 bg-gray-100 border border-dashed border-gray-300 text-center text-sm">
+                    Link da Shopee em breve
+                  </div>
+                )}
+
+                {/* Botão Reservar Mais */}
+                <button
+                  onClick={() => {
+                    setTelaConfirmacao(false);
+                    setReservaConfirmada(null);
+                  }}
+                  className="w-full py-3 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 shadow-md transition-all duration-200 flex items-center justify-center gap-2 text-sm"
+                >
+                  <Gift className="w-4 h-4" />
+                  Reservar Mais Presentes
+                </button>
+              </div>
+
+              <p className="text-center text-xs text-gray-400 mt-3">
+                A Sarah Lorrine vai adorar!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <footer className="py-12 text-center text-pink-400 border-t border-pink-100">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <Heart className="w-4 h-4 fill-current" />
+          <span>Feito com amor para Sarah Lorrine</span>
+          <Heart className="w-4 h-4 fill-current" />
+        </div>
+        <p className="text-sm text-pink-300">Aniversário de 3 aninhos</p>
       </footer>
     </div>
   );
+
 }
