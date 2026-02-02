@@ -24,6 +24,7 @@ export default function ListaPresentes({ gifts, auth }) {
   const [presentes, setPresentes] = useState(gifts || []);
   const [loading, setLoading] = useState(!gifts);
   const [filtro, setFiltro] = useState("Todos");
+  const [filtroDisponibilidade, setFiltroDisponibilidade] = useState("Todos"); // "Todos", "Disponíveis", "Reservados"
   const [carrinhoAberto, setCarrinhoAberto] = useState(false);
   const [carrinho, setCarrinho] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -261,9 +262,13 @@ export default function ListaPresentes({ gifts, auth }) {
     }
   };
 
-  const presentesFiltrados = filtro === "Todos"
-    ? presentes
-    : presentes.filter(p => p.categoria === filtro);
+  const presentesFiltrados = presentes
+    .filter(p => filtro === "Todos" ? true : p.categoria === filtro)
+    .filter(p => {
+      if (filtroDisponibilidade === "Disponíveis") return !p.reservado;
+      if (filtroDisponibilidade === "Reservados") return p.reservado;
+      return true; // "Todos"
+    });
 
   const disponíveis = presentes.filter(p => !p.reservado).length;
   const reservados = presentes.filter(p => p.reservado).length;
@@ -403,6 +408,29 @@ export default function ListaPresentes({ gifts, auth }) {
             >
               {cat !== "Todos" && <span className="mr-1">{iconesCategorias[cat]}</span>}
               {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Filtro de Disponibilidade */}
+        <div className="flex flex-wrap gap-2 justify-center mt-4">
+          <span className="text-xs text-gray-500 font-medium self-center mr-1">Mostrar:</span>
+          {["Todos", "Disponíveis", "Reservados"].map(status => (
+            <button
+              key={status}
+              onClick={() => setFiltroDisponibilidade(status)}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border ${filtroDisponibilidade === status
+                ? status === "Disponíveis"
+                  ? "bg-teal-500 text-white border-teal-500 shadow-md"
+                  : status === "Reservados"
+                    ? "bg-gray-500 text-white border-gray-500 shadow-md"
+                    : "bg-purple-500 text-white border-purple-500 shadow-md"
+                : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+                }`}
+            >
+              {status === "Disponíveis" && "✓ "}
+              {status === "Reservados" && "✗ "}
+              {status}
             </button>
           ))}
         </div>
