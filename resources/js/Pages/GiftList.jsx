@@ -50,6 +50,7 @@ export default function ListaPresentes({ gifts, auth }) {
   const [telaConfirmacao, setTelaConfirmacao] = useState(false);
   const [reservasConfirmadas, setReservasConfirmadas] = useState([]);
   const [mostrarSubir, setMostrarSubir] = useState(false);
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
 
   useEffect(() => {
     if (gifts) {
@@ -457,8 +458,9 @@ export default function ListaPresentes({ gifts, auth }) {
                       <img
                         src={presente.imagem || "/placeholder.svg"}
                         alt={presente.nome}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 cursor-pointer"
                         onError={() => handleImageError(presente.id)}
+                        onClick={() => setProdutoSelecionado(presente)}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
@@ -825,6 +827,97 @@ export default function ListaPresentes({ gifts, auth }) {
         </div>
         <p className="text-sm text-pink-300">Aniversário de 3 aninhos</p>
       </footer>
+      {/* Modal de Detalhes do Produto */}
+      {produtoSelecionado && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[60] p-4 animate-in fade-in duration-200"
+          onClick={() => setProdutoSelecionado(null)}
+        >
+          <div
+            className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setProdutoSelecionado(null)}
+              className="absolute top-4 right-4 z-10 bg-black/20 hover:bg-black/40 text-white p-2 rounded-full transition-colors backdrop-blur-sm"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <div className="relative aspect-square bg-gray-100">
+              <img
+                src={produtoSelecionado.imagem || "/placeholder.svg"}
+                alt={produtoSelecionado.nome}
+                className="w-full h-full object-contain"
+              />
+              {/* Categoria Badge */}
+              <span className={`absolute bottom-4 left-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border backdrop-blur-md bg-white/90 ${coresCategorias[produtoSelecionado.categoria]}`}>
+                {iconesCategorias[produtoSelecionado.categoria]} {produtoSelecionado.categoria}
+              </span>
+            </div>
+
+            <div className="p-6 bg-white">
+              <h2 className="text-2xl font-bold text-gray-800 leading-tight mb-2">
+                {produtoSelecionado.nome}
+              </h2>
+
+              {!produtoSelecionado.reservado && produtoSelecionado.preco && (
+                <p className="text-xl font-bold text-teal-600 mb-6">{produtoSelecionado.preco}</p>
+              )}
+
+              {produtoSelecionado.reservado ? (
+                <div className="bg-gray-100 rounded-xl p-4 flex items-center gap-3 text-gray-500">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+                    <Check className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm">Indisponível</p>
+                    <p className="text-xs">Já reservado por {produtoSelecionado.reservadoPor}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex gap-3">
+                  {estaNoCarrinho(produtoSelecionado.id) ? (
+                    <button
+                      onClick={() => {
+                        removerDoCarrinho(produtoSelecionado.id);
+                        setProdutoSelecionado(null);
+                      }}
+                      className="flex-1 py-3.5 rounded-xl font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Minus className="w-5 h-5" />
+                      Remover do Carrinho
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        adicionarAoCarrinho(produtoSelecionado);
+                        setProdutoSelecionado(null);
+                      }}
+                      className="flex-1 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 shadow-xl transition-all flex items-center justify-center gap-2 transform hover:scale-[1.02]"
+                    >
+                      <Plus className="w-5 h-5" />
+                      Adicionar ao Carrinho
+                    </button>
+                  )}
+
+                  {produtoSelecionado.link && (
+                    <a
+                      href={produtoSelecionado.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-14 flex items-center justify-center rounded-xl bg-orange-100 hover:bg-orange-200 border border-orange-200 text-orange-600 transition-colors"
+                      title="Ver na Shopee"
+                    >
+                      <img src="https://deo.shopeemobile.com/shopee/shopee-pcmall-live-sg/assets/icon_favicon_1_32.9cd61b2e90c0f104.png" alt="Shopee" className="w-6 h-6" />
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
