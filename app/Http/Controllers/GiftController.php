@@ -10,7 +10,7 @@ class GiftController extends Controller
 {
     public function index()
     {
-        $gifts = Gift::all();
+        $gifts = Gift::with('user')->get();
 
         // Se for requisição AJAX/Fetch, retorne JSON no formato esperado pelo frontend
         if ((request()->ajax() || request()->wantsJson()) && !request()->inertia()) {
@@ -24,6 +24,8 @@ class GiftController extends Controller
                     'link' => $g->link,
                     'reservado' => (bool) $g->reservado,
                     'reservadoPor' => $g->reservado_por ?? '',
+                    'user' => $g->user, // Pass the whole user object (or null)
+                    'user_id' => $g->user_id, // Keep for easy check
                     'imagem' => $g->imagem, // Adding this as it might be needed
                 ];
             });
@@ -84,7 +86,7 @@ class GiftController extends Controller
                 \Illuminate\Support\Facades\Mail::to('talitasantoos11031999@gmail.com')
                     ->send(new \App\Mail\ReservationConfirmed($reservedGifts, $request->nome));
             } catch (\Exception $e) {
-                
+
                 \Illuminate\Support\Facades\Log::error('Erro ao enviar email de reserva: ' . $e->getMessage());
             }
         }

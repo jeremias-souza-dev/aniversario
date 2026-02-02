@@ -19,4 +19,9 @@ class Gift extends Model
     protected $casts = [
         'reservado' => 'boolean',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
