@@ -422,10 +422,10 @@ export default function ListaPresentes({ gifts, auth }) {
                         : "hover:shadow-xl hover:-translate-y-1"
                     }`}
                 >
-                  {/* Badge de Status */}
+                  {/* Status Badges */}
                   {presente.reservado && (
-                    <div className="absolute top-2 right-2 z-10 bg-gray-800/80 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                      <Check className="w-3 h-3" /> Reservado
+                    <div className="absolute top-2 right-2 z-10 bg-gray-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 font-bold">
+                      <Check className="w-3 h-3" /> Reservado {presente.reservadoPor ? `por ${presente.user_id === auth?.user?.id ? 'Você' : presente.reservadoPor.split(' ')[0]}` : ''}
                     </div>
                   )}
                   {conflitos.includes(presente.id) && !presente.reservado && (

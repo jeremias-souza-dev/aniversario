@@ -13,6 +13,7 @@ class Gift extends Model
         'reservado_por',
         'imagem',
         'link',
+        'user_id',
     ];
 
     protected $casts = [
