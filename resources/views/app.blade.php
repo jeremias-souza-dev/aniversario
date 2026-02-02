@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Aniversário da Sarah Lorraine</title>
+    <meta property="og:title" content="Aniversário da Sarah Lorraine" />
+    <meta property="og:description" content="Você está convidado para celebrar o aniversário da Sarah Lorraine! Veja todos os detalhes e confirme sua presença." />
+    <meta property="og:url" content="{{ url()->current() }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sarah Lorraine" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
