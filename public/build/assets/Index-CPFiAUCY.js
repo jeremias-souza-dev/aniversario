@@ -1,1 +1,0 @@
-import{j as t}from"./app-_VQetXMp.js";import r from"./GiftList-C9viL0GN.js";import"./star-CQk2tHcF.js";import"./party-popper-BxLtpSQa.js";import"./gift-BCJGzjQb.js";import"./user-XopHhaJL.js";function n(){return t.jsx(r,{})}export{n as default};
