@@ -867,9 +867,17 @@ export default function ListaPresentes({ gifts, auth }) {
 
               {produtoSelecionado.reservado ? (
                 <div className="bg-gray-100 rounded-xl p-4 flex items-center gap-3 text-gray-500">
-                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
-                    <Check className="w-5 h-5" />
-                  </div>
+                  {(produtoSelecionado.avatar || produtoSelecionado?.user?.avatar) ? (
+                    <img
+                      src={produtoSelecionado.avatar || produtoSelecionado?.user?.avatar}
+                      alt="Avatar"
+                      className="w-10 h-10 rounded-full border-2 border-gray-300 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+                      <User className="w-5 h-5" />
+                    </div>
+                  )}
                   <div>
                     <p className="font-bold text-sm">Indisponível</p>
                     <p className="text-xs">Já reservado por {produtoSelecionado.reservadoPor}</p>
