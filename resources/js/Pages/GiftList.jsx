@@ -326,6 +326,15 @@ export default function ListaPresentes({ gifts, auth }) {
             Sarah Lorraine
           </h1>
 
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-3 mb-6 inline-block shadow-md border-2 border-pink-100">
+            <p className="text-sm text-gray-600 mb-1 font-medium">📏 Informações de Tamanho:</p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 justify-center text-xs text-gray-700">
+              <span className="font-semibold">👕 Camisa: <span className="text-pink-600">4</span></span>
+              <span className="font-semibold">👖 Calça: <span className="text-pink-600">4</span></span>
+              <span className="font-semibold">👟 Sapato: <span className="text-pink-600">25/26</span></span>
+            </div>
+          </div>
+
           <p className="text-xl text-pink-600 font-semibold mb-8">Carrinho de Reservas</p>
 
           <div className="flex justify-center gap-4 flex-wrap">
