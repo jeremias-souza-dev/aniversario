@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Gift, Star, Heart, Check, Sparkles, PartyPopper, ExternalLink, Loader2, ImageOff, ArrowUp, ShoppingBag, Plus, Minus, X, Package, Truck } from "lucide-react";
+import { Gift, Star, Heart, Check, Sparkles, PartyPopper, ExternalLink, Loader2, ImageOff, ArrowUp, ShoppingBag, Plus, Minus, X, Package, Truck, User } from "lucide-react";
 import Swal from 'sweetalert2';
 import confetti from 'canvas-confetti';
 
@@ -422,22 +422,22 @@ export default function ListaPresentes({ gifts, auth }) {
                         : "hover:shadow-xl hover:-translate-y-1"
                     }`}
                 >
+
                   {/* Status Badges */}
                   {presente.reservado && (
-                    <div className="absolute top-2 right-2 z-10 bg-gray-500 text-white text-xs pl-2 pr-1 py-1 rounded-full flex items-center gap-2 font-bold shadow-sm border border-white/20">
-                      <span className="flex items-center gap-1"><Check className="w-3 h-3" /> Reservado</span>
-                      {presente.user?.avatar ? (
+                    <div className="absolute top-2 right-2 z-10 bg-white/95 text-gray-700 text-xs pl-1 pr-3 py-1 rounded-full flex items-center gap-2 font-bold shadow-md border border-gray-100">
+                      {(presente.avatar || presente?.user?.avatar) ? (
                         <img
-                          src={presente.user.avatar}
-                          alt={presente.reservadoPor}
-                          className="w-5 h-5 rounded-full border border-white object-cover"
-                          title={`Reservado por ${presente.reservadoPor}`}
+                          src={presente.avatar || presente?.user?.avatar}
+                          alt="Avatar"
+                          className="w-5 h-5 rounded-full border border-gray-200"
                         />
                       ) : (
-                        <span className="text-[10px] opacity-80 px-1 border-l border-white/30">
-                          {presente.user_id === auth?.user?.id ? 'Você' : (presente.reservadoPor?.split(' ')[0] || 'Alguém')}
-                        </span>
+                        <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
+                          <User className="w-3 h-3 text-gray-500" />
+                        </div>
                       )}
+                      <span>Reservado</span>
                     </div>
                   )}
                   {conflitos.includes(presente.id) && !presente.reservado && (

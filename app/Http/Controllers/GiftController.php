@@ -10,7 +10,7 @@ class GiftController extends Controller
 {
     public function index()
     {
-        $gifts = Gift::with('user')->get();
+        $gifts = Gift::with('user')->get(); // Eager load user
 
         // Se for requisição AJAX/Fetch, retorne JSON no formato esperado pelo frontend
         if ((request()->ajax() || request()->wantsJson()) && !request()->inertia()) {
@@ -24,8 +24,8 @@ class GiftController extends Controller
                     'link' => $g->link,
                     'reservado' => (bool) $g->reservado,
                     'reservadoPor' => $g->reservado_por ?? '',
-                    'user' => $g->user, // Pass the whole user object (or null)
-                    'user_id' => $g->user_id, // Keep for easy check
+                    'user_id' => $g->user_id,
+                    'avatar' => $g->user ? $g->user->avatar : null, // Avatar from relationship
                     'imagem' => $g->imagem, // Adding this as it might be needed
                 ];
             });
